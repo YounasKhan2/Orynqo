@@ -9,6 +9,7 @@ import { z } from "zod";
 import { AppShell } from "./shell";
 import { WorkItemsPage } from "../features/work-items/WorkItemsPage";
 import { MyWorkPage } from "../features/my-work/MyWorkPage";
+import { InboxPage } from "../features/inbox/InboxPage";
 const rootRoute = createRootRoute({
   component: () => (
     <AppShell>
@@ -39,6 +40,9 @@ const myWorkSearch = z.object({
   sort: z.enum(["key", "title", "priority"]).catch("priority"),
   selected: z.string().optional(),
 });
+const inboxSearch = z.object({
+  selected: z.string().optional(),
+});
 const workItemsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/projects/$projectId/issues",
@@ -51,9 +55,16 @@ const myWorkRoute = createRoute({
   validateSearch: (search) => myWorkSearch.parse(search),
   component: MyWorkPage,
 });
+const inboxRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/inbox",
+  validateSearch: (search) => inboxSearch.parse(search),
+  component: InboxPage,
+});
 const routeTree = rootRoute.addChildren([
   indexRoute,
   myWorkRoute,
+  inboxRoute,
   workItemsRoute,
 ]);
 export const router = createRouter({ routeTree });

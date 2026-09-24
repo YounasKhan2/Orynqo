@@ -10,6 +10,8 @@ export const queryKeys = {
   workItems: (params: WorkItemCollectionParams) =>
     ["workItems", params] as const,
   workItem: (id: string) => ["workItem", id] as const,
+  inbox: (userId: string, workspaceId: string) =>
+    ["inbox", userId, workspaceId] as const,
   comments: (id: string) => ["workItem", id, "comments"] as const,
   activity: (id: string) => ["workItem", id, "activity"] as const,
   access: (type: string, id: string) => ["access", type, id] as const,

@@ -33,7 +33,7 @@ function WorkspaceSidebar({ compact, drawer, onToggle, onClose }: { compact: boo
       {!drawer && onToggle && <button type="button" onClick={onToggle} aria-label={compact ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!compact} className="absolute -right-3 top-3 z-20 grid size-6 place-items-center rounded-full border border-[var(--border-subtle)] bg-[var(--surface-base)] text-[var(--text-secondary)] shadow-sm">{compact ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}</button>}
       <nav className="grid gap-0.5">
         <a href="/my-work" className={link + (pathname === "/my-work" ? active : "")} title={compact ? "My Work" : undefined}>⌂<span className={labelClass}>My Work</span></a>
-        <a className={link} title={compact ? "Inbox" : undefined}>◉<span className={labelClass}>Inbox</span></a>
+        <a href="/inbox" className={link + (pathname === "/inbox" ? active : "")} title={compact ? "Inbox" : undefined}>◉<span className={labelClass}>Inbox</span></a>
         <a href="/projects/platform-core/issues?status=not-done&sort=key" className={link + (pathname.startsWith("/projects/") ? active : "")} title={compact ? "Projects" : undefined}>▣<span className={labelClass}>Projects</span></a>
         <a className={link} title={compact ? "Teams" : undefined}>◇<span className={labelClass}>Teams</span></a>
         <a className={link} title={compact ? "Views" : undefined}>≡<span className={labelClass}>Views</span></a>
