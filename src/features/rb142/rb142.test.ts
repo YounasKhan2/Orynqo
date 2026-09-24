@@ -7,7 +7,7 @@ const command = (
   expectedVersion: number,
   mutationId: string,
   payload: Rb142Command["payload"],
-): Rb142Command => ({ commandType, expectedVersion, mutationId, actorId: "user-muhammad-y", workspaceId: "workspace-product", resourceId: "wi-rb-142", payload });
+): Rb142Command => ({ commandType, expectedVersion, mutationId, resourceId: "wi-rb-142", payload });
 
 describe("RB-142 server-authoritative development contract", () => {
   beforeEach(() => rb142DevelopmentServer.reset());
