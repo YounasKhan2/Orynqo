@@ -1,20 +1,32 @@
-import type { Rb142Command, Rb142CommandResult } from "./model";
+import type { CommandGateway, CommandResult } from "../../application/commands";
+import type { Rb142CommandPayload, Rb142Snapshot } from "./model";
 import { rb142DevelopmentServer } from "./development-server";
 
-export interface Rb142CommandGateway {
-  execute(command: Rb142Command): Promise<Rb142CommandResult>;
-}
-
-export class DevelopmentRb142CommandGateway implements Rb142CommandGateway {
-  execute(command: Rb142Command) {
-    return rb142DevelopmentServer.execute(command);
+export class DevelopmentRb142CommandGateway implements CommandGateway {
+  async execute<TPayload, TCanonical>(
+    commandType: string,
+    command: {
+      mutationId: string;
+      actorId: string;
+      workspaceId: string;
+      resourceId: string;
+      expectedVersion: number;
+      payload: TPayload;
+    },
+  ): Promise<CommandResult<TCanonical>> {
+    const result = await rb142DevelopmentServer.execute({
+      ...command,
+      commandType: commandType as
+        | "workItem.changePriority"
+        | "workItem.createComment"
+        | "workItem.transitionStatus",
+      payload: command.payload as Rb142CommandPayload,
+    });
+    return result as CommandResult<TCanonical>;
   }
 }
 
-/**
- * Development-only adapter. The production boundary is an Appwrite Function
- * carrying the same command envelope. UI code never receives a TablesDB write
- * client. See docs/architecture/rb-142-production-boundary.md.
- */
-export const rb142CommandGateway: Rb142CommandGateway =
+export const rb142CommandGateway: CommandGateway =
   new DevelopmentRb142CommandGateway();
+
+export type Rb142Canonical = Rb142Snapshot;

@@ -1,174 +1,46 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { queryKeys } from "../../application/query-keys";
-import {
-  RecentRealtimeEventIds,
-  reconcileRealtime,
-} from "../../application/realtime-reconciliation";
-import {
-  PendingMutationRegistry,
-  type MutationPhase,
-} from "../../application/mutations";
+import { executeDomainMutation, PendingMutationRegistry, type MutationPhase } from "../../application/mutations";
+import { RecentRealtimeEventIds, reconcileRealtime } from "../../application/realtime-reconciliation";
+import { applyRb142CanonicalToQueryCache } from "./cache";
+import { rb142DevelopmentEvents } from "./development-events";
 import { rb142CommandGateway } from "./gateway";
-import {
-  RB142_COMMENT,
-  type Rb142Command,
-  type Rb142CommandResult,
-  type Rb142Snapshot,
-} from "./model";
-import { rb142DevelopmentServer } from "./development-server";
+import { commentMutationPlan, priorityMutationPlan, statusMutationPlan } from "./plans";
+import type { Rb142Snapshot } from "./model";
 
-const registry = new PendingMutationRegistry();
-const recentEvents = new RecentRealtimeEventIds();
+const registry=new PendingMutationRegistry();
+const recentEvents=new RecentRealtimeEventIds();
+export type PropertyState={phase:MutationPhase;message?:string;attemptedValue?:string;canonicalValue?:string};
 
-export type PropertyState = {
-  phase: MutationPhase;
-  message?: string;
-  attemptedValue?: string;
-  canonicalValue?: string;
-};
+export function useRb142(initial:Rb142Snapshot|undefined){
+ const client=useQueryClient();const [priorityState,setPriorityState]=useState<PropertyState>({phase:"idle"});const [statusState,setStatusState]=useState<PropertyState>({phase:"idle"});const [commentState,setCommentState]=useState<PropertyState>({phase:"idle"});const ids=useRef(new Map<string,string>());
+ const nextId=(key:string)=>{const existing=ids.current.get(key);if(existing)return existing;const id=crypto.randomUUID();ids.current.set(key,id);return id};
+ const run=useCallback(async(kind:"priority"|"status"|"comment")=>{
+  const current=client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))??initial;if(!current||current.unavailable)return;
+  const id=nextId(kind);const args={mutationId:id,expectedVersion:current.workItem.version};
+  const plan=kind==="priority"?priorityMutationPlan(args):kind==="status"?statusMutationPlan(args):commentMutationPlan(args);
+  const setState=kind==="priority"?setPriorityState:kind==="status"?setStatusState:setCommentState;
+  setState({phase:typeof navigator!=="undefined"&&!navigator.onLine?"offline":"pending",attemptedValue:String(plan.attemptedValue??"")});
+  const result=await executeDomainMutation(client,rb142CommandGateway,registry,plan);
+  if(result.ok){ids.current.delete(kind);setState({phase:"settled"});return result}
+  const entry=registry.get(id);const canonical=entry?.canonicalValue as Rb142Snapshot|undefined;
+  setState({phase:entry?.phase??"failure",attemptedValue:String(plan.attemptedValue??""),canonicalValue:kind==="priority"?canonical?.workItem.priority:kind==="status"?canonical?.workItem.statusLabel:undefined,message:result.message});return result;
+ },[client,initial]);
 
-export function useRb142(initial: Rb142Snapshot | undefined) {
-  const client = useQueryClient();
-  const [priorityState, setPriorityState] = useState<PropertyState>({ phase: "idle" });
-  const [statusState, setStatusState] = useState<PropertyState>({ phase: "idle" });
-  const [commentState, setCommentState] = useState<PropertyState>({ phase: "idle" });
-  const mutationIds = useRef(new Map<string, string>());
+ const receiveRealtime=useCallback((event:Parameters<typeof rb142DevelopmentEvents.deliver>[0])=>{
+  const current=client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"));const pending=registry.forResource("wi-rb-142").filter(e=>e.phase==="pending"||e.phase==="offline");const preserve=pending.flatMap(e=>e.affectedFields);
+  const decision=reconcileRealtime({...event,resourceId:"wi-rb-142"},current?.workItem.version??0,registry,recentEvents);
+  if(decision==="apply")applyRb142CanonicalToQueryCache(client,event.canonical,{preservePendingFields:preserve});
+  if(decision==="ack-local")applyRb142CanonicalToQueryCache(client,event.canonical);
+  if(decision==="same-field-conflict"){
+   const conflict=registry.forResource("wi-rb-142").find(e=>e.phase==="conflict");
+   if(conflict?.affectedFields.includes("priority"))setPriorityState({phase:"conflict",attemptedValue:String(conflict.attemptedValue??""),canonicalValue:event.canonical.workItem.priority,message:"Priority changed remotely. Choose which value to keep."});
+   if(conflict?.affectedFields.includes("statusId"))setStatusState({phase:"conflict",attemptedValue:String(conflict.attemptedValue??""),canonicalValue:event.canonical.workItem.statusLabel,message:"Status changed remotely. Choose which value to keep."});
+  }
+  return decision;
+ },[client]);
 
-  const setCanonical = useCallback((snapshot: Rb142Snapshot) => {
-    client.setQueryData(queryKeys.workItem("wi-rb-142"), snapshot);
-    client.setQueryData(queryKeys.comments("wi-rb-142"), snapshot.comments);
-    client.setQueryData(queryKeys.activity("wi-rb-142"), snapshot.activity);
-    client.setQueryData(queryKeys.access("workItem", "wi-rb-142"), snapshot.access);
-  }, [client]);
-
-  const nextMutationId = (logicalKey: string) => {
-    const existing = mutationIds.current.get(logicalKey);
-    if (existing) return existing;
-    const id = crypto.randomUUID();
-    mutationIds.current.set(logicalKey, id);
-    return id;
-  };
-
-  const run = useCallback(async (
-    commandType: Rb142Command["commandType"],
-    affectedFields: readonly string[],
-    payload: Rb142Command["payload"],
-    setState: (state: PropertyState) => void,
-    attemptedValue: string,
-    logicalKey: string,
-  ): Promise<Rb142CommandResult | undefined> => {
-    const canonical = client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142")) ?? initial;
-    if (!canonical || canonical.unavailable) return undefined;
-    const mutationId = nextMutationId(logicalKey);
-    const command: Rb142Command = {
-      commandType,
-      mutationId,
-      resourceId: "wi-rb-142",
-      expectedVersion: canonical.workItem.version,
-      payload,
-    };
-    registry.register({
-      mutationId,
-      resourceId: "wi-rb-142",
-      commandType,
-      affectedFields,
-      expectedVersion: canonical.workItem.version,
-      attemptedValue,
-      phase: navigator.onLine ? "pending" : "offline",
-    });
-    setState({
-      phase: navigator.onLine ? "pending" : "offline",
-      attemptedValue,
-      canonicalValue:
-        affectedFields[0] === "priority"
-          ? canonical.workItem.priority
-          : affectedFields[0] === "statusId"
-            ? canonical.workItem.statusLabel
-            : undefined,
-      message: navigator.onLine ? undefined : "Offline — change is unacknowledged.",
-    });
-    if (!navigator.onLine) {
-      return { ok: false, code: "offline", message: "Offline — change is unacknowledged." };
-    }
-
-    const result = await rb142CommandGateway.execute(command);
-    if (result.ok) {
-      setCanonical(result.canonical);
-      registry.settle(mutationId);
-      mutationIds.current.delete(logicalKey);
-      setState({ phase: "settled" });
-      return result;
-    }
-
-    registry.update(mutationId, {
-      phase: result.code === "conflict" ? "conflict" : "failure",
-      failureCode: result.code,
-      error: result.message,
-      canonicalValue: result.canonical,
-    });
-    if (result.canonical) setCanonical(result.canonical);
-    setState({
-      phase: result.code === "conflict" ? "conflict" : result.code === "offline" ? "offline" : "failure",
-      attemptedValue,
-      message: result.message,
-    });
-    return result;
-  }, [client, initial, setCanonical]);
-
-  const changePriority = () =>
-    run("workItem.changePriority", ["priority"], { priority: "urgent" }, setPriorityState, "Urgent", "priority");
-
-  const submitComment = () =>
-    run("workItem.createComment", [], { body: RB142_COMMENT }, setCommentState, RB142_COMMENT, "comment");
-
-  const transitionStatus = () =>
-    run("workItem.transitionStatus", ["statusId"], { statusId: "status-review" }, setStatusState, "Review", "status");
-
-  const receiveRealtime = useCallback((event: {
-    eventId: string;
-    mutationId?: string;
-    resourceVersion: number;
-    changedFields: readonly string[];
-    canonical: Rb142Snapshot;
-  }) => {
-    const current = client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"));
-    const decision = reconcileRealtime(
-      { ...event, resourceId: "wi-rb-142" },
-      current?.workItem.version ?? 0,
-      registry,
-      recentEvents,
-    );
-    if (decision === "apply") setCanonical(event.canonical);
-    if (decision === "same-field-conflict") {
-      const priorityConflict = registry.forResource("wi-rb-142").find(
-        (entry) => entry.phase === "conflict" && entry.affectedFields.includes("priority"),
-      );
-      if (priorityConflict) {
-        setPriorityState({
-          phase: "conflict",
-          attemptedValue: String(priorityConflict.attemptedValue ?? ""),
-          message: "Priority changed remotely. Choose which value to keep.",
-        });
-      }
-    }
-    return decision;
-  }, [client, setCanonical]);
-
-  const regression = useMemo(() => ({
-    reset: () => rb142DevelopmentServer.reset(),
-    server: rb142DevelopmentServer,
-    receiveRealtime,
-  }), [receiveRealtime]);
-
-  return {
-    priorityState,
-    statusState,
-    commentState,
-    changePriority,
-    submitComment,
-    transitionStatus,
-    setCanonical,
-    regression,
-  };
+ useEffect(()=>rb142DevelopmentEvents.subscribe(receiveRealtime),[receiveRealtime]);
+ return{priorityState,statusState,commentState,changePriority:()=>run("priority"),submitComment:()=>run("comment"),transitionStatus:()=>run("status")};
 }

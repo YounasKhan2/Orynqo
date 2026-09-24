@@ -2,24 +2,15 @@
 
 ## Status
 
-The RB-142 browser experience in this branch uses an explicitly isolated development command server because this repository does not contain deployable Appwrite project credentials/resources. It must not be described as exercised production persistence.
+The RB-142 browser experience in this branch uses an explicitly isolated development command server and development/test event transport because this repository does not contain deployable Appwrite project credentials/resources. It must not be described as exercised production persistence or Appwrite Realtime.
 
-The production contract is nevertheless fixed:
+The production contract remains:
 
-UI → TanStack mutation/application command → Appwrite Function → identity + Orynqo authorization → lifecycle/workflow validation → expectedVersion → mutationId idempotency → TablesDB transaction → canonical result → query reconciliation → Realtime reconciliation.
-
-## Current Appwrite verification — 2026-09-24
-
-Official Appwrite documentation was re-verified for this gate.
-
-- TablesDB transactions can stage multiple row operations across tables and commit them atomically. Commit detects external row conflicts.
-- Appwrite row permissions provide coarse read/update/delete access to users/teams/roles.
-- Appwrite Functions receive authenticated user identity/JWT headers. A Function can use the invoking JWT for user-scoped reads and a least-privilege dynamic key for the privileged transaction after Orynqo domain authorization.
-- Realtime subscriptions are permission-secured and client-side; Server SDK API-key Realtime is not available. Session changes require subscription lifecycle handling.
+UI → ORY-015 MutationPlan / executeDomainMutation → Appwrite Function → identity + Orynqo authorization → lifecycle/workflow validation → expectedVersion → mutationId idempotency → TablesDB transaction → canonical result → TanStack Query reconciliation → Realtime reconciliation.
 
 ## Production transaction shape
 
-Each successful RB-142 command is one TablesDB transaction:
+Each successful RB-142 command is intended to be one TablesDB transaction:
 
 1. load canonical Work Item and Effective Access inputs;
 2. reject forbidden/lifecycle/workflow/version failures;
@@ -31,20 +22,22 @@ Each successful RB-142 command is one TablesDB transaction:
 8. commit;
 9. return canonical result.
 
-The resulting Work Item version is server-owned. A duplicate mutationId returns the recorded logical result and must not repeat Work Item, Comment or Activity side effects.
+The Work Item version is server-owned. A duplicate mutationId returns the recorded logical result and must not repeat Work Item, Comment or Activity side effects.
 
-## Tables/resources required
+## Current exercised vertical slice
 
-Minimum production resources for this slice:
+The exercised architecture in this branch is:
 
-- work_items
-- comments
-- activity_events
-- mutation_receipts
-- workspace_memberships / project access inputs required by Effective Access
+UI → concrete RB-142 MutationPlan → ORY-015 executeDomainMutation → DevelopmentRb142CommandGateway → Rb142DevelopmentServer → canonical result → shared RB-142 Query projection helper.
 
-This branch does not fabricate those cloud resources.
+Incoming development/test events use:
 
-## Development adapter
+Rb142DevelopmentServer → Rb142DevelopmentEventTransport → reconcileRealtime → the same Query projection helper.
 
-`src/features/rb142/development-server.ts` mirrors the server contract in-memory for the vertical-slice UI and focused regression tests. It owns canonical revisioning, workflow validation, access checks, mutation receipts, Comments and Activity. Regression controls are code/test helpers only; no simulation controls are exposed in product UI.
+The event transport is deliberately named and scoped as development/test infrastructure. It is not Appwrite Realtime.
+
+## Query ownership
+
+TanStack Query owns client-side server-derived RB-142 projections. The development server remains the simulated server authority. RB-142 is not copied into Zustand, React Context, or another client-side canonical store.
+
+The collection and inspector can have different projections, but both are reconciled from the same logical RB-142 server state.
