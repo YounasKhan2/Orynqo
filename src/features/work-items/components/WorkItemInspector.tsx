@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
-import { IconButton, InlineAlert } from "../../design-system/primitives";
-import { useWorkItem } from "./queries";
+import { IconButton, InlineAlert } from "../../../design-system/primitives";
+import { useWorkItem } from "../queries";
 
 export function WorkItemInspector({ id, onClose }: { id: string; onClose: () => void }) {
   const query = useWorkItem(id);

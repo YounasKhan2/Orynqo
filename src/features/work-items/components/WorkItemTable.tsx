@@ -1,8 +1,8 @@
 import {flexRender,getCoreRowModel,useReactTable,type ColumnDef} from "@tanstack/react-table";
 import {useVirtualizer} from "@tanstack/react-virtual";
 import {useMemo,useRef,type KeyboardEvent} from "react";
-import type {WorkItemListItem} from "./model";
-import {isEditableTarget} from "./keyboard";
+import type {WorkItemListItem} from "../model";
+import {isEditableTarget} from "../keyboard";
 const gridTemplate="30px 76px minmax(220px,1fr) 96px 76px 118px 88px";
 type Props={items:readonly WorkItemListItem[];selectedWorkItemId?:string | undefined;checkedWorkItemIds:ReadonlySet<string>;onContextSelect:(id:string)=>void;onCheckedChange:(id:string,checked:boolean)=>void;onOpen:(id:string)=>void;ariaLabel?:string};
 export function WorkItemTable({items,selectedWorkItemId,checkedWorkItemIds,onContextSelect,onCheckedChange,onOpen,ariaLabel="Project Work Items"}:Props){

@@ -1,0 +1,1 @@
+export function MutationStateLabel({phase}:{phase:string}){if(phase==="idle"||phase==="settled")return null;return <span className={`mutation-state mutation-${phase}`} role="status">{phase==="pending"?"Pending":phase==="offline"?"Offline · unacknowledged":phase}</span>}
