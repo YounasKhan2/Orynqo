@@ -3,16 +3,16 @@
 > This is the volatile handoff document. Update it at every approved gate.
 
 **Last updated:** 2026-09-24  
-**Overall phase:** Design System v1.1 controlled propagation  
-**Current gate:** Design Validation Pass 01 → approved corrections propagation → Human Review  
-**Engineering status:** STOPPED  
-**Design status:** ACTIVE — propagation only  
-**PM status:** coordinating/freeze enforcement
+**Overall phase:** Design System v1.1 frozen; integration checkpoint  
+**Current gate:** Design System v1.1 Final Review & Freeze — **APPROVED**  
+**Engineering status:** STOPPED until the approved baseline is integrated and the next vertical slice is explicitly opened  
+**Design status:** FROZEN — Orynqo Design System v1.1  
+**PM status:** integration / baseline preparation
 
 ## Repository
 Repository: `YounasKhan2/Orynqo`
 
-Current approved engineering branch: `feat/rb-142-golden-flow`
+Approved engineering branch: `feat/rb-142-golden-flow`
 
 Approved commits:
 - Golden Flow base: `f8ad7cbf474e2f4a3b93a5d6860dc700f38e94fb`
@@ -20,42 +20,36 @@ Approved commits:
 
 Handoff pack branch: `docs/agent-handoff-pack-v1` (created from the approved RB-142 branch).
 
-## Figma
+## Figma — Design System v1.1 frozen
 File key: `c3gkf8389lOXtHCaOUhlhm`
 
-Design Validation Pass 01:
-- Page: `29 Design Validation Pass 01`
-- Page node: `61:2`
-- Main board: `61:3`
-- Human Review: **APPROVED FOR PROPAGATION**
+Design Validation Pass 01 remains preserved:
+- Page node `61:2`
+- Board `61:3`
 
-Primary propagation targets:
-- 12 System Library `34:9` / core `34:10`
-- 22 RB-142 Golden Flow `46:2` / `46:3`
-- 27 Responsive & Completion `54:2` / `54:3`
-- 28 Implementation Handoff `55:2` / `55:3`
+Final propagation inspected and approved:
+- System Library additions `62:2`
+- RB-142 regression/state appendix `62:242`
+- Responsive propagation `62:465`
+- Data & States correction `62:473`
+- Interaction Specification correction `62:480`
+- Accessibility correction `62:488`
+- Engineering contract `62:497`
 
-Secondary spec updates only if needed:
-- 06 Data & States `9:2`
-- 08 Interaction Specification `12:2`
-- 10 Accessibility & QA `17:2`
+**Design version:** Orynqo Design System v1.1 — FROZEN.
 
-## Current design target
-**Orynqo Design System v1.1**
-
-Approved changes:
-- Property Mutation State refinements.
-- Property Conflict Resolver.
-- Context Notice for access/lifecycle.
-- Dedicated Unavailable Context State.
-- Comment Sending/Failure with draft preservation.
-- Activity hierarchy refinement.
-- Responsive state composition.
-- Accessibility/focus/non-color state semantics.
-
-Important review notes:
-- Unavailable is not merely a small ContextNotice variant; it replaces unsafe detail.
-- Settled is not a persistent “Saved” badge.
+Final review confirmed:
+- Property Mutation State family exists.
+- Priority/Status conflict resolvers exist.
+- Context Notice Access/Lifecycle remains distinct from Unavailable.
+- Unavailable is a dedicated contextual tombstone.
+- Comment Idle/Sending/Failure states exist.
+- Activity hierarchy is represented.
+- Eight RB-142 regression cases are represented.
+- Responsive state propagation retains frozen breakpoints.
+- Engineering handoff contains the v1.1 contract.
+- Settled is transient; no persistent Saved state.
+- No new tokens were required.
 
 ## Completed engineering
 - ORY-000→010 foundation.
@@ -77,18 +71,16 @@ Important review notes:
 ## Intentionally deferred
 - Actual Appwrite persistence.
 - Actual Appwrite Realtime.
-- Broad product implementation beyond the approved slice.
+- Broad implementation beyond the approved slice.
 - Additional infrastructure without measured need.
 - Deferred product features listed in the Master/frozen decisions.
 
 ## Next permitted action
-Design agent completes controlled v1.1 propagation and reports exact modified Figma nodes/components/tokens plus cross-page QA.
+Integrate the handoff documentation with the approved RB-142 engineering baseline, verify the resulting branch/build/tests, then merge the fully approved baseline to `main`.
 
-Then: **Human Review — Design System v1.1 Final Review & Freeze.**
-
-Only after that freeze may PM select the next implementation vertical slice.
+After main is stable, PM may select and explicitly open the next vertical slice on a fresh branch.
 
 ## STOP conditions
-- Engineering agent: do not implement anything now.
-- Design agent: stop after v1.1 propagation/report; do not choose new features.
-- PM agent: do not open next engineering gate before final design freeze.
+- Design: no further design work until a new design gate is explicitly opened.
+- Engineering: no new feature work during baseline integration.
+- PM: do not select/start the next vertical slice until main contains the approved baseline and verification passes.
