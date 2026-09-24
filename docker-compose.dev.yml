@@ -1,0 +1,3 @@
+# Appwrite Cloud Development supplies current backend infrastructure.
+# Add local support services only when an actual requirement exists.
+services: {}

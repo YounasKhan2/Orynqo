@@ -1,0 +1,1 @@
+import {describe,expect,it} from "vitest";import {queryKeys} from "./query-keys";describe("query keys",()=>{it("keeps identity stable",()=>{expect(queryKeys.workItem("rb-142")).toEqual(["workItem","rb-142"]);expect(queryKeys.comments("rb-142")).toEqual(["workItem","rb-142","comments"])})});
