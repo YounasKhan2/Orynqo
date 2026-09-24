@@ -17,11 +17,11 @@ export function MyWorkPage() {
   const navigate = useNavigate({ from: "/my-work" });
   const [selectedWorkItemId, setSelectedWorkItemId] = useState<string | undefined>(search.selected);
   const [checkedWorkItemIds, setCheckedWorkItemIds] = useState<Set<string>>(() => new Set());
-  const lastFocusedId = useRef<string | undefined>();
+  const lastFocusedId = useRef<string | undefined>(undefined);
   const query = useMyWork({
     userId: CURRENT_USER_ID,
     workspaceId: PRODUCT_WORKSPACE_ID,
-    search: search.q,
+    ...(search.q === undefined ? {} : { search: search.q }),
     statusFilter: search.status,
     group: search.group,
     sort: search.sort,

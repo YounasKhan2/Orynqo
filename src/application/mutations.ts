@@ -1,18 +1,7 @@
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
-import type {
-  CommandEnvelope,
-  CommandGateway,
-  CommandResult,
-} from "./commands";
+import type { CommandEnvelope, CommandFailureCode, CommandGateway, CommandResult } from "./commands";
 
-export type MutationPhase =
-  | "idle"
-  | "editing"
-  | "pending"
-  | "settled"
-  | "failure"
-  | "conflict"
-  | "offline";
+export type MutationPhase = "idle" | "editing" | "pending" | "settled" | "failure" | "conflict" | "offline";
 
 export type PendingMutation<TAttempted = unknown> = {
   mutationId: string;
@@ -24,59 +13,47 @@ export type PendingMutation<TAttempted = unknown> = {
   optimisticState?: unknown;
   canonicalValue?: unknown;
   phase: MutationPhase;
-  failureCode?: Exclude<CommandResult<never> & { ok: false }, never>["code"];
+  failureCode?: CommandFailureCode;
   error?: string;
 };
 
 export class PendingMutationRegistry {
   private readonly entries = new Map<string, PendingMutation>();
-
-  register(entry: PendingMutation) {
-    this.entries.set(entry.mutationId, entry);
-  }
-  get(mutationId: string) {
-    return this.entries.get(mutationId);
-  }
-  forResource(resourceId: string) {
-    return [...this.entries.values()].filter(
-      (entry) => entry.resourceId === resourceId,
-    );
-  }
+  register(entry: PendingMutation) { this.entries.set(entry.mutationId, entry); }
+  get(mutationId: string) { return this.entries.get(mutationId); }
+  forResource(resourceId: string) { return [...this.entries.values()].filter((entry) => entry.resourceId === resourceId); }
   update(mutationId: string, patch: Partial<PendingMutation>) {
     const current = this.entries.get(mutationId);
     if (current) this.entries.set(mutationId, { ...current, ...patch });
   }
   settle(mutationId: string) {
-    this.update(mutationId, { phase: "settled", failureCode: undefined, error: undefined });
+    const current = this.entries.get(mutationId);
+    if (!current) return;
+    const { failureCode: _failureCode, error: _error, ...rest } = current;
+    this.entries.set(mutationId, { ...rest, phase: "settled" });
   }
-  remove(mutationId: string) {
-    this.entries.delete(mutationId);
-  }
+  remove(mutationId: string) { this.entries.delete(mutationId); }
 }
 
-export type MutationPlan<TPayload, TCanonical> = {
+export type MutationPlan<TPayload, TCanonical, TSnapshot = unknown> = {
   commandType: string;
   affectedFields: readonly string[];
   command: CommandEnvelope<TPayload>;
   affectedQueryKeys: readonly QueryKey[];
-  optimistic: (client: QueryClient) => unknown;
-  rollback: (client: QueryClient, snapshot: unknown) => void;
+  optimistic: (client: QueryClient) => TSnapshot;
+  rollback: (client: QueryClient, snapshot: TSnapshot) => void;
   reconcile: (client: QueryClient, canonical: TCanonical) => void;
   attemptedValue?: unknown;
 };
 
-function isOnline() {
-  return typeof navigator === "undefined" || navigator.onLine;
-}
+function isOnline() { return typeof navigator === "undefined" || navigator.onLine; }
 
-export async function executeDomainMutation<TPayload, TCanonical>(
+export async function executeDomainMutation<TPayload, TCanonical, TSnapshot>(
   client: QueryClient,
   gateway: CommandGateway,
   registry: PendingMutationRegistry,
-  plan: MutationPlan<TPayload, TCanonical>,
+  plan: MutationPlan<TPayload, TCanonical, TSnapshot>,
 ): Promise<CommandResult<TCanonical>> {
-  // Optimistic intent is intentionally applied before connectivity is checked.
-  // When offline it remains visible but unacknowledged and is never canonical.
   const snapshot = plan.optimistic(client);
   registry.register({
     mutationId: plan.command.mutationId,
@@ -84,30 +61,20 @@ export async function executeDomainMutation<TPayload, TCanonical>(
     commandType: plan.commandType,
     affectedFields: plan.affectedFields,
     expectedVersion: plan.command.expectedVersion,
-    attemptedValue: plan.attemptedValue,
+    ...(plan.attemptedValue === undefined ? {} : { attemptedValue: plan.attemptedValue }),
     optimisticState: snapshot,
     phase: isOnline() ? "pending" : "offline",
   });
 
-  if (!isOnline()) {
-    return {
-      ok: false,
-      code: "offline",
-      message: "Offline: local intent is unacknowledged.",
-    };
-  }
+  if (!isOnline()) return { ok: false, code: "offline", message: "Offline: local intent is unacknowledged." };
 
   try {
-    const result = await gateway.execute<TPayload, TCanonical>(
-      plan.commandType,
-      plan.command,
-    );
+    const result = await gateway.execute<TPayload, TCanonical>(plan.commandType, plan.command);
     if (result.ok) {
       plan.reconcile(client, result.canonical);
       registry.settle(plan.command.mutationId);
       return result;
     }
-
     plan.rollback(client, snapshot);
     registry.update(plan.command.mutationId, {
       phase: result.code === "conflict" ? "conflict" : "failure",
@@ -116,21 +83,11 @@ export async function executeDomainMutation<TPayload, TCanonical>(
     });
     return result;
   } catch (error) {
-    // Transport failure is not a domain/version conflict. Roll back the cache,
-    // retain the registry entry and mutationId so the same logical attempt can
-    // be retried deterministically.
     plan.rollback(client, snapshot);
-    registry.update(plan.command.mutationId, {
-      phase: isOnline() ? "failure" : "offline",
-      failureCode: isOnline() ? "transport_error" : "offline",
-      error:
-        error instanceof Error ? error.message : "Mutation transport failed",
-    });
-    return {
-      ok: false,
-      code: isOnline() ? "transport_error" : "offline",
-      message:
-        error instanceof Error ? error.message : "Mutation transport failed",
-    };
+    const online = isOnline();
+    const code: CommandFailureCode = online ? "transport_error" : "offline";
+    const message = error instanceof Error ? error.message : "Mutation transport failed";
+    registry.update(plan.command.mutationId, { phase: online ? "failure" : "offline", failureCode: code, error: message });
+    return { ok: false, code, message };
   }
 }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { IconButton, InlineAlert } from "../../design-system/primitives";
 import { isEditableTarget } from "../work-items/keyboard";
-import { RB142_COMMENT, type Rb142Snapshot } from "./model";
+import { RB142_COMMENT } from "./model";
 import { useRb142 } from "./use-rb142";
 import { useRb142Snapshot } from "./queries";
 

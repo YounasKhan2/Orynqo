@@ -15,8 +15,8 @@ export function WorkItemsPage() {
   const navigate = useNavigate({ from: "/projects/$projectId/issues" });
   const [selectedWorkItemId, setSelectedWorkItemId] = useState<string | undefined>(search.selected);
   const [checkedWorkItemIds, setCheckedWorkItemIds] = useState<Set<string>>(() => new Set());
-  const lastFocusedId = useRef<string | undefined>();
-  const query = useWorkItemCollection({ projectId, search: search.q, statusFilter: search.status, sort: search.sort });
+  const lastFocusedId = useRef<string | undefined>(undefined);
+  const query = useWorkItemCollection({ projectId, ...(search.q === undefined ? {} : { search: search.q }), statusFilter: search.status, sort: search.sort });
 
   const setChecked = (id: string, checked: boolean) => setCheckedWorkItemIds((current) => {
     const next = new Set(current); if (checked) next.add(id); else next.delete(id); return next;
