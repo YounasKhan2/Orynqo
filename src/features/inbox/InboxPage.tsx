@@ -4,7 +4,7 @@ import { WorkItemCollectionLayout } from "../work-items/components/WorkItemColle
 import { WorkItemInspector } from "../work-items/components/WorkItemInspector";
 import { Rb142Inspector } from "../rb142/Rb142Inspector";
 import { InboxCollection, InboxFailure, InboxLoading } from "./components/InboxCollection";
-import { canOpenNotificationTarget } from "./model";
+import { focusRestoreSelector, targetForNotification } from "./interaction";
 import { useInbox, useSetNotificationRead } from "./queries";
 
 const CURRENT_USER_ID = "user-muhammad-y";
@@ -18,12 +18,14 @@ export function InboxPage() {
   const readMutation = useSetNotificationRead(queryInput);
   const lastFocusedNotificationId = useRef<string | undefined>(undefined);
   const selectedNotification = query.data?.groups.flatMap((group) => group.notifications).find((notification) => notification.id === search.selected);
-  const selectedTargetId = selectedNotification && canOpenNotificationTarget(selectedNotification) ? selectedNotification.targetId : undefined;
+  const selectedTargetId = selectedNotification
+    ? targetForNotification(selectedNotification)
+    : undefined;
 
   const closeInspector = () => {
     const restore = lastFocusedNotificationId.current;
     void navigate({ search: {}, replace: true });
-    requestAnimationFrame(() => restore && document.querySelector<HTMLElement>(`[data-notification-id="${restore}"]`)?.focus());
+    requestAnimationFrame(() => restore && document.querySelector<HTMLElement>(focusRestoreSelector(restore))?.focus());
   };
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export function InboxPage() {
             data={query.data}
             selectedNotificationId={search.selected}
             onSelect={(notification) => {
-              if (!canOpenNotificationTarget(notification)) return;
+              if (!targetForNotification(notification)) return;
               lastFocusedNotificationId.current = notification.id;
               void navigate({ search: { selected: notification.id }, replace: true });
             }}

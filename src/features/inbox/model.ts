@@ -1,4 +1,8 @@
-export type NotificationTargetState = "accessible" | "inaccessible" | "revoked" | "unavailable";
+export type NotificationTargetState =
+  | "accessible"
+  | "inaccessible"
+  | "revoked"
+  | "unavailable";
 
 export type InboxNotification = {
   id: string;
@@ -40,15 +44,26 @@ export function canOpenNotificationTarget(notification: InboxNotification) {
   return notification.targetState === "accessible";
 }
 
-export function safeNotificationText(notification: InboxNotification) {
+export function safeNotificationPresentation(notification: InboxNotification) {
   if (notification.targetState === "accessible") {
     return {
+      actorLabel: notification.actorLabel,
       eventLabel: notification.eventLabel,
       sourceEntityLabel: notification.sourceEntityLabel,
     };
   }
   return {
+    actorLabel: "Restricted",
     eventLabel: "Work Item is no longer available",
     sourceEntityLabel: "Restricted source",
   };
+}
+
+export function formatNotificationAge(occurredAt: string, now: Date) {
+  const elapsedMs = Math.max(0, now.getTime() - new Date(occurredAt).getTime());
+  const minutes = Math.floor(elapsedMs / 60_000);
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h`;
+  return `${Math.floor(hours / 24)}d`;
 }

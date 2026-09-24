@@ -1,4 +1,5 @@
 import type { KeyboardEvent } from "react";
+import { isNotificationActivationKey, notificationRowTabIndex } from "../interaction";
 import type { InboxNotification, InboxResult } from "../model";
 import { canOpenNotificationTarget, safeNotificationText } from "../model";
 

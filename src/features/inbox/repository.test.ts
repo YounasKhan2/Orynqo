@@ -1,13 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { DevelopmentInboxRepository } from "./repository";
-import { safeNotificationText } from "./model";
+import { safeNotificationPresentation } from "./model";
 
-const input = { userId: "user-muhammad-y", workspaceId: "workspace-product" };
+const input = {
+  userId: "user-muhammad-y",
+  workspaceId: "workspace-product",
+};
 
 describe("Inbox repository", () => {
   it("retrieves personal notifications deterministically with frozen grouping semantics", async () => {
     const result = await new DevelopmentInboxRepository().list(input);
-    expect(result.groups.map((group) => group.label)).toEqual(["Unread", "Earlier"]);
+    expect(result.groups.map((group) => group.label)).toEqual([
+      "Unread",
+      "Earlier",
+    ]);
     expect(result.groups[0]?.notifications[0]?.id).toBe("notification-rb-142");
   });
 
@@ -25,10 +31,13 @@ describe("Inbox repository", () => {
     const repository = new DevelopmentInboxRepository();
     const notification = await repository.get("notification-revoked");
     expect(notification).toBeDefined();
-    expect(safeNotificationText(notification!)).toEqual({
+    expect(safeNotificationPresentation(notification!)).toEqual({
+      actorLabel: "Restricted",
       eventLabel: "Work Item is no longer available",
       sourceEntityLabel: "Restricted source",
     });
-    expect(safeNotificationText(notification!).eventLabel).not.toContain("Protected");
+    expect(
+      Object.values(safeNotificationPresentation(notification!)).join(" "),
+    ).not.toContain("Protected");
   });
 });
