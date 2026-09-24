@@ -3,29 +3,31 @@
 Collaborative work platform. The frozen Figma system is the UI/UX source of truth.
 
 ## Current gate
-ORY-000 through ORY-010 foundation only. ORY-011 Work Item collection and later RB-142 feature work are intentionally not started.
 
-## Prerequisites
-Node.js 24, npm 11, and access to the Orynqo Development Appwrite Cloud project. Development must never target Production.
+Implemented foundation: ORY-000–010.
 
-## Setup
+Implementation Gate 2 branch adds ORY-011–015: the Project Work Items collection, canonical virtualized table, contextual inspector, and generic mutation/realtime reconciliation framework. The concrete Priority → Comment → Status Golden Flow remains intentionally deferred.
+
+## Run locally
+
 1. Copy `.env.example` to `.env.local`.
 2. Fill Development Appwrite values.
 3. Run `npm install`.
 4. Run `npm run dev`.
+5. Open `/projects/platform-core/issues?status=not-done&sort=key&selected=wi-rb-142`.
 
-## Validation
-`npm run build`, `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm test`.
+The collection currently uses an explicitly isolated development repository fixture, including RB-142, the long RB-124 title, and >5k rows so virtualization can be reviewed. It is not presented as production Appwrite persistence or authorization.
 
 ## Architecture
+
 UI → Application → Domain → Infrastructure → Appwrite.
 
-React components do not perform arbitrary domain writes directly through Appwrite. Important mutations cross an application command boundary and will be server-authoritative with authentication, authorization, lifecycle/domain validation, expected-version concurrency, persistent mutation idempotency, transactional persistence where supported, Activity creation and canonical response reconciliation. Reads use TanStack Query through repository boundaries.
+Server data belongs to TanStack Query. URL-addressable collection state belongs to TanStack Router search params. Local interaction state stays local. Domain mutations cross the application command boundary; React does not directly write Appwrite rows.
 
-See `docs/architecture/ADR-000-infrastructure-foundation.md` and `docs/architecture/ORY-007-appwrite-feasibility.md`.
+## Validation
 
-## Docker
-`docker-compose.dev.yml` is the convention for supporting local infrastructure only. It intentionally has no services today. Do not add speculative Redis/Kafka/RabbitMQ/search/Kubernetes infrastructure.
+GitHub Actions is intentionally disabled due to the current billing constraint. Validation is local/manual for now; this gate does not claim unexecuted checks as passing.
 
-## Environments
-Development = Orynqo Development Appwrite project. Production = Orynqo Production Appwrite project. No permanent third environment is assumed under the current Education entitlement.
+## Gate discipline
+
+ORY-016+ concrete Golden Flow commands are not part of this branch.

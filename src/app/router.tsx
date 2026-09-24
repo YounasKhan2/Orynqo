@@ -1,1 +1,32 @@
-import {createRootRoute,createRoute,createRouter,Outlet} from "@tanstack/react-router";import {AppShell} from "./shell";const rootRoute=createRootRoute({component:()=> <AppShell><Outlet/></AppShell>});const indexRoute=createRoute({getParentRoute:()=>rootRoute,path:"/",component:()=> <div><h2>Foundation ready</h2><p>ORY-000–010 infrastructure gate. Work Item collection intentionally not started.</p></div>});const routeTree=rootRoute.addChildren([indexRoute]);export const router=createRouter({routeTree});declare module "@tanstack/react-router"{interface Register{router:typeof router}}
+import { Navigate, Outlet, createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
+import { z } from "zod";
+import { AppShell } from "./shell";
+import { WorkItemsPage } from "../features/work-items/WorkItemsPage";
+import "../features/work-items/work-items.css";
+
+const rootRoute = createRootRoute({ component: () => <AppShell><Outlet /></AppShell> });
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/",
+  component: () => <Navigate to="/projects/$projectId/issues" params={{ projectId: "platform-core" }} search={{ status: "not-done", sort: "key" }} />,
+});
+
+const workItemsSearch = z.object({
+  q: z.string().optional(),
+  status: z.enum(["not-done", "all"]).catch("not-done"),
+  sort: z.enum(["key", "title", "priority"]).catch("key"),
+  selected: z.string().optional(),
+});
+
+const workItemsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/projects/$projectId/issues",
+  validateSearch: (search) => workItemsSearch.parse(search),
+  component: WorkItemsPage,
+});
+
+const routeTree = rootRoute.addChildren([indexRoute, workItemsRoute]);
+export const router = createRouter({ routeTree });
+
+declare module "@tanstack/react-router" { interface Register { router: typeof router; } }
