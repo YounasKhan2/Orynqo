@@ -28,7 +28,7 @@ function WorkspaceSidebar({ compact, drawer, onToggle, onClose }: { compact: boo
   const active = " bg-[var(--accent-subtle)] border-[var(--border-subtle)]";
   const labelClass = compact ? "sr-only" : "ml-2";
   return (
-    <aside className={`${drawer ? "h-full w-[min(280px,82vw)] shadow-xl" : "relative min-h-0"} overflow-auto border-r border-[var(--border-subtle)] bg-[var(--surface-subtle)] px-2 py-[10px]`}>
+    <aside className={`${drawer ? "h-full w-[min(280px,82vw)] shadow-xl" : "relative min-h-0"} overflow-y-auto overflow-x-hidden border-r border-[var(--border-subtle)] bg-[var(--surface-subtle)] px-2 py-[10px]`}>
       {drawer && <button type="button" onClick={onClose} className="mb-2 ml-auto grid size-8 place-items-center border-0 bg-transparent text-[var(--text-secondary)]" aria-label="Close navigation"><X size={16} /></button>}
       {!drawer && onToggle && <button type="button" onClick={onToggle} aria-label={compact ? "Expand sidebar" : "Collapse sidebar"} aria-expanded={!compact} className="absolute -right-3 top-3 z-20 grid size-6 place-items-center rounded-full border border-[var(--border-subtle)] bg-[var(--surface-base)] text-[var(--text-secondary)] shadow-sm">{compact ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}</button>}
       <nav className="grid gap-0.5">
@@ -48,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [wideCollapsed, setWideCollapsed] = useState(false);
   const [navigationOpen, setNavigationOpen] = useState(false);
   return (
-    <div className={`grid h-screen min-w-0 grid-cols-[minmax(0,1fr)] grid-rows-[48px_minmax(0,1fr)] overflow-hidden md:grid-cols-[56px_minmax(0,1fr)] lg:${wideCollapsed ? "grid-cols-[56px_minmax(0,1fr)]" : "grid-cols-[var(--sidebar-width)_minmax(0,1fr)]"}`}>
+    <div className={wideCollapsed ? "grid h-screen min-w-0 grid-cols-[minmax(0,1fr)] grid-rows-[48px_minmax(0,1fr)] overflow-hidden md:grid-cols-[56px_minmax(0,1fr)] lg:grid-cols-[56px_minmax(0,1fr)]" : "grid h-screen min-w-0 grid-cols-[minmax(0,1fr)] grid-rows-[48px_minmax(0,1fr)] overflow-hidden md:grid-cols-[56px_minmax(0,1fr)] lg:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]"}>
       <GlobalBar onOpenNavigation={() => setNavigationOpen(true)} />
       <div className="hidden min-h-0 md:block"><WorkspaceSidebar compact={wideCollapsed} onToggle={() => setWideCollapsed((value) => !value)} /></div>
       <main className="min-h-0 min-w-0 overflow-hidden bg-[var(--surface-base)]">{children}</main>

@@ -3,7 +3,7 @@ import { z } from "zod";
 const EnvSchema = z.object({
   VITE_APPWRITE_ENDPOINT: z.string().url(),
   VITE_APPWRITE_PROJECT_ID: z.string().min(1),
-  VITE_APPWRITE_DATABASE_ID: z.string().min(1),
+  VITE_APPWRITE_DATABASE_ID: z.string().default(""),
   VITE_ORYNQO_ENV: z.enum(["development", "production"]).default("development"),
 });
 
