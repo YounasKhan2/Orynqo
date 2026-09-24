@@ -46,7 +46,7 @@ export function priorityMutationPlan(
       applyRb142OptimisticFields(client, { priority: "urgent" });
       return previous;
     },
-    rollback: restoreRb142QueryCache,
+    rollback: (client, snapshot) => restoreRb142QueryCache(client, snapshot as ReturnType<typeof captureRb142QueryCache>),
     reconcile: applyRb142CanonicalToQueryCache,
   };
 }
@@ -68,7 +68,7 @@ export function statusMutationPlan(
       });
       return previous;
     },
-    rollback: restoreRb142QueryCache,
+    rollback: (client, snapshot) => restoreRb142QueryCache(client, snapshot as ReturnType<typeof captureRb142QueryCache>),
     reconcile: applyRb142CanonicalToQueryCache,
   };
 }
@@ -87,7 +87,7 @@ export function commentMutationPlan(
     ],
     attemptedValue: RB142_COMMENT,
     optimistic: (client: QueryClient) => captureRb142QueryCache(client),
-    rollback: restoreRb142QueryCache,
+    rollback: (client, snapshot) => restoreRb142QueryCache(client, snapshot as ReturnType<typeof captureRb142QueryCache>),
     reconcile: applyRb142CanonicalToQueryCache,
   };
 }

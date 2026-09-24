@@ -17,7 +17,7 @@ export class Rb142DevelopmentEventTransport {
 
   subscribe(listener: Listener) {
     this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
+    return () => { this.listeners.delete(listener); };
   }
 
   deliver(event: Rb142DevelopmentEvent) {

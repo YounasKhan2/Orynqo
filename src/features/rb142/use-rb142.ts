@@ -22,10 +22,10 @@ export function useRb142(initial:Rb142Snapshot|undefined){
   const plan=kind==="priority"?priorityMutationPlan(args):kind==="status"?statusMutationPlan(args):commentMutationPlan(args);
   const setState=kind==="priority"?setPriorityState:kind==="status"?setStatusState:setCommentState;
   setState({phase:typeof navigator!=="undefined"&&!navigator.onLine?"offline":"pending",attemptedValue:String(plan.attemptedValue??"")});
-  const result=await executeDomainMutation(client,rb142CommandGateway,registry,plan);
+  const result = kind === "priority"\n    ? await executeDomainMutation(client, rb142CommandGateway, registry, priorityMutationPlan(args))\n    : kind === "status"\n      ? await executeDomainMutation(client, rb142CommandGateway, registry, statusMutationPlan(args))\n      : await executeDomainMutation(client, rb142CommandGateway, registry, commentMutationPlan(args));
   if(result.ok){ids.current.delete(kind);setState({phase:"settled"});return result}
   const entry=registry.get(id);const canonical=entry?.canonicalValue as Rb142Snapshot|undefined;
-  setState({phase:entry?.phase??"failure",attemptedValue:String(plan.attemptedValue??""),canonicalValue:kind==="priority"?canonical?.workItem.priority:kind==="status"?canonical?.workItem.statusLabel:undefined,message:result.message});return result;
+  const canonicalValue=kind==="priority"?canonical?.workItem.priority:kind==="status"?canonical?.workItem.statusLabel:undefined;\n  setState({phase:entry?.phase??"failure",attemptedValue:String(plan.attemptedValue??""),...(canonicalValue===undefined?{}:{canonicalValue}),message:result.message});return result;
  },[client,initial]);
 
  const receiveRealtime=useCallback((event:Parameters<typeof rb142DevelopmentEvents.deliver>[0])=>{
