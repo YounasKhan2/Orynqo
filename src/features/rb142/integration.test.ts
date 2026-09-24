@@ -7,7 +7,8 @@ import type { WorkItemCollectionResult } from "../work-items/model";
 import { applyRb142CanonicalToQueryCache } from "./cache";
 import { rb142DevelopmentServer } from "./development-server";
 import { rb142CommandGateway } from "./gateway";
-import { priorityMutationPlan,statusMutationPlan } from "./plans";\nimport type { Rb142Snapshot } from "./model";
+import { priorityMutationPlan,statusMutationPlan } from "./plans";
+import type { Rb142Snapshot } from "./model";
 
 function setup(){const client=new QueryClient();const s=rb142DevelopmentServer.read();const collectionKey=queryKeys.workItems({projectId:"platform-core",filters:{status:"not-done",q:""},sort:"key"});client.setQueryData(queryKeys.workItem("wi-rb-142"),s);client.setQueryData<WorkItemCollectionResult>(collectionKey,{items:[s.workItem],totalCount:1,stale:false});return{client,collectionKey}}
 describe("RB-142 corrected integration",()=>{

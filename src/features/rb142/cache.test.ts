@@ -1,7 +1,8 @@
 import { QueryClient } from "@tanstack/react-query";
 import { describe, expect, it } from "vitest";
 import { queryKeys } from "../../application/query-keys";
-import type { WorkItemCollectionResult } from "../work-items/model";\nimport type { Rb142Snapshot } from "./model";
+import type { WorkItemCollectionResult } from "../work-items/model";
+import type { Rb142Snapshot } from "./model";
 import { rb142DevelopmentServer } from "./development-server";
 import { applyRb142CanonicalToQueryCache, applyRb142OptimisticFields, captureRb142QueryCache, restoreRb142QueryCache } from "./cache";
 
