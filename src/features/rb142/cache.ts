@@ -8,7 +8,9 @@ export type Rb142CacheSnapshot = {
   collections: readonly [QueryKey, WorkItemCollectionResult | undefined][];
 };
 
-export function captureRb142QueryCache(client: QueryClient): Rb142CacheSnapshot {
+export function captureRb142QueryCache(
+  client: QueryClient,
+): Rb142CacheSnapshot {
   return {
     detail: client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142")),
     collections: client
@@ -22,7 +24,8 @@ export function restoreRb142QueryCache(
   snapshot: Rb142CacheSnapshot,
 ) {
   client.setQueryData(queryKeys.workItem("wi-rb-142"), snapshot.detail);
-  for (const [key, value] of snapshot.collections) client.setQueryData(key, value);
+  for (const [key, value] of snapshot.collections)
+    client.setQueryData(key, value);
 }
 
 export function applyRb142CanonicalToQueryCache(
@@ -30,7 +33,9 @@ export function applyRb142CanonicalToQueryCache(
   snapshot: Rb142Snapshot,
   options: { preservePendingFields?: readonly string[] } = {},
 ) {
-  const current = client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"));
+  const current = client.getQueryData<Rb142Snapshot>(
+    queryKeys.workItem("wi-rb-142"),
+  );
   const preserve = new Set(options.preservePendingFields);
   const workItem = {
     ...snapshot.workItem,
@@ -38,7 +43,10 @@ export function applyRb142CanonicalToQueryCache(
       ? { priority: current.workItem.priority }
       : {}),
     ...(preserve.has("statusId") && current
-      ? { statusId: current.workItem.statusId, statusLabel: current.workItem.statusLabel }
+      ? {
+          statusId: current.workItem.statusId,
+          statusLabel: current.workItem.statusLabel,
+        }
       : {}),
   };
   const merged: Rb142Snapshot = { ...snapshot, workItem };
@@ -51,7 +59,9 @@ export function applyRb142CanonicalToQueryCache(
     { queryKey: ["workItems"] },
     (collection) => {
       if (!collection) return collection;
-      const index = collection.items.findIndex((item) => item.id === "wi-rb-142");
+      const index = collection.items.findIndex(
+        (item) => item.id === "wi-rb-142",
+      );
       if (index < 0) return collection;
       const items = [...collection.items];
       items[index] = { ...items[index], ...workItem };
@@ -64,11 +74,17 @@ export function applyRb142OptimisticFields(
   client: QueryClient,
   patch: Partial<Rb142Snapshot["workItem"]>,
 ) {
-  const current = client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"));
+  const current = client.getQueryData<Rb142Snapshot>(
+    queryKeys.workItem("wi-rb-142"),
+  );
   if (current) {
     client.setQueryData(queryKeys.workItem("wi-rb-142"), {
       ...current,
-      workItem: { ...current.workItem, ...patch, version: current.workItem.version },
+      workItem: {
+        ...current.workItem,
+        ...patch,
+        version: current.workItem.version,
+      },
     });
   }
   client.setQueriesData<WorkItemCollectionResult>(

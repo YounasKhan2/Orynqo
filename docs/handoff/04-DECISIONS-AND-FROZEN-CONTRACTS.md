@@ -2,41 +2,42 @@
 
 Status vocabulary: **FROZEN**, **APPROVED**, **DEFERRED**, **SUPERSEDED**. Reopen a frozen decision only with concrete contradictory evidence and explicit review.
 
-| Decision | Status | Reason / contract |
-|---|---|---|
-| Organization is governance/billing/security boundary | FROZEN | Keeps governance distinct from collaboration/data scope. |
-| Workspace is primary collaboration/data boundary | FROZEN | Membership, teams, projects, workflows and discovery are workspace-scoped. |
-| Org membership does not imply workspace access | FROZEN | Prevents accidental cross-workspace visibility. |
-| Authorization order is identity→membership/scope→visibility→capability→explicit grant/restriction→lifecycle | FROZEN | Canonical effective-access evaluation. |
-| Activity and Audit are separate | FROZEN | Product history vs governance/security evidence. |
-| Assignment and watcher subscription are separate | FROZEN | Different semantics and notification behavior. |
-| Archive is lifecycle, not permission removal | FROZEN | Archived resources may remain readable but read-only. |
-| Saved View sharing never grants record access | FROZEN | Query configuration cannot elevate authorization. |
-| Search enforces effective access | FROZEN | No discovery leakage. |
-| Compact collection + contextual inspector | FROZEN | Core Orynqo interaction model. |
-| Desktop Work Item table keeps Priority and Cycle | FROZEN | Stable information geometry. |
-| Responsive ranges ≥1280 / 1024–1279 / 720–1023 / <720 | FROZEN | Composition changes, semantics do not. |
-| React 19 + TypeScript + Vite frontend baseline | APPROVED | Current implementation baseline. |
-| TanStack Router/Query/Table/Virtual | APPROVED | Routing, server-state, table and virtualization baseline. |
-| Appwrite Cloud Education as initial backend infrastructure | APPROVED | Strong low-cost starting capacity; architecture remains provider-bounded. |
-| UI→Application→Domain→Infrastructure→Appwrite | FROZEN | Prevents provider SDK coupling throughout UI. |
-| Important writes use explicit domain commands | FROZEN | Centralizes auth/lifecycle/workflow/version/idempotency/Activity. |
-| Query owns server-derived client projections | APPROVED | Avoid duplicate canonical client stores. |
-| Server-authoritative revision + optimistic concurrency | FROZEN | Required for collaborative mutation correctness. |
-| Stable mutationId/idempotency | FROZEN | Prevents duplicate effects/comments/Activity. |
-| Realtime is transport, not canonical truth | FROZEN | Canonical server response/version wins. |
-| Hybrid authorization: Appwrite coarse + Orynqo rich domain checks | APPROVED | Do not weaken product permissions to provider primitives. |
-| Native Vite HMR + Docker Compose only for needed supporting infra | APPROVED | Fast DX without containerizing everything. |
-| No premature NestJS/Redis/Kafka/Elastic/Kubernetes/GraphQL | FROZEN until evidence | Infrastructure follows measured need. |
-| Actual Appwrite persistence integration | DEFERRED | Development vertical slice currently proves architecture without fabricating production integration. |
-| Actual Appwrite Realtime integration | DEFERRED | Development event transport currently exercises reconciliation seam. |
-| Project-specific workflow overrides | DEFERRED | Post-current scope. |
-| Project-local custom fields | DEFERRED | Post-current scope. |
-| Organization templates | DEFERRED | Post-current scope. |
-| Automation UI | DEFERRED | Future event/action layer. |
-| Design Validation Pass 01 findings | APPROVED | Human Review approved propagation to Design System v1.1. |
-| Settled is transient, not permanent Saved UI | APPROVED | Avoid persistent noise after successful acknowledgement. |
-| Unavailable is a dedicated contextual tombstone | APPROVED | Unsafe detail must be replaced while surrounding collection context remains. |
+| Decision                                                                                                    | Status                | Reason / contract                                                                                    |
+| ----------------------------------------------------------------------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------- |
+| Organization is governance/billing/security boundary                                                        | FROZEN                | Keeps governance distinct from collaboration/data scope.                                             |
+| Workspace is primary collaboration/data boundary                                                            | FROZEN                | Membership, teams, projects, workflows and discovery are workspace-scoped.                           |
+| Org membership does not imply workspace access                                                              | FROZEN                | Prevents accidental cross-workspace visibility.                                                      |
+| Authorization order is identity→membership/scope→visibility→capability→explicit grant/restriction→lifecycle | FROZEN                | Canonical effective-access evaluation.                                                               |
+| Activity and Audit are separate                                                                             | FROZEN                | Product history vs governance/security evidence.                                                     |
+| Assignment and watcher subscription are separate                                                            | FROZEN                | Different semantics and notification behavior.                                                       |
+| Archive is lifecycle, not permission removal                                                                | FROZEN                | Archived resources may remain readable but read-only.                                                |
+| Saved View sharing never grants record access                                                               | FROZEN                | Query configuration cannot elevate authorization.                                                    |
+| Search enforces effective access                                                                            | FROZEN                | No discovery leakage.                                                                                |
+| Compact collection + contextual inspector                                                                   | FROZEN                | Core Orynqo interaction model.                                                                       |
+| Desktop Work Item table keeps Priority and Cycle                                                            | FROZEN                | Stable information geometry.                                                                         |
+| Responsive ranges ≥1280 / 1024–1279 / 720–1023 / <720                                                       | FROZEN                | Composition changes, semantics do not.                                                               |
+| React 19 + TypeScript + Vite frontend baseline                                                              | APPROVED              | Current implementation baseline.                                                                     |
+| TanStack Router/Query/Table/Virtual                                                                         | APPROVED              | Routing, server-state, table and virtualization baseline.                                            |
+| Appwrite Cloud Education as initial backend infrastructure                                                  | APPROVED              | Strong low-cost starting capacity; architecture remains provider-bounded.                            |
+| UI→Application→Domain→Infrastructure→Appwrite                                                               | FROZEN                | Prevents provider SDK coupling throughout UI.                                                        |
+| Important writes use explicit domain commands                                                               | FROZEN                | Centralizes auth/lifecycle/workflow/version/idempotency/Activity.                                    |
+| Query owns server-derived client projections                                                                | APPROVED              | Avoid duplicate canonical client stores.                                                             |
+| Server-authoritative revision + optimistic concurrency                                                      | FROZEN                | Required for collaborative mutation correctness.                                                     |
+| Stable mutationId/idempotency                                                                               | FROZEN                | Prevents duplicate effects/comments/Activity.                                                        |
+| Realtime is transport, not canonical truth                                                                  | FROZEN                | Canonical server response/version wins.                                                              |
+| Hybrid authorization: Appwrite coarse + Orynqo rich domain checks                                           | APPROVED              | Do not weaken product permissions to provider primitives.                                            |
+| Native Vite HMR + Docker Compose only for needed supporting infra                                           | APPROVED              | Fast DX without containerizing everything.                                                           |
+| No premature NestJS/Redis/Kafka/Elastic/Kubernetes/GraphQL                                                  | FROZEN until evidence | Infrastructure follows measured need.                                                                |
+| Actual Appwrite persistence integration                                                                     | DEFERRED              | Development vertical slice currently proves architecture without fabricating production integration. |
+| Actual Appwrite Realtime integration                                                                        | DEFERRED              | Development event transport currently exercises reconciliation seam.                                 |
+| Project-specific workflow overrides                                                                         | DEFERRED              | Post-current scope.                                                                                  |
+| Project-local custom fields                                                                                 | DEFERRED              | Post-current scope.                                                                                  |
+| Organization templates                                                                                      | DEFERRED              | Post-current scope.                                                                                  |
+| Automation UI                                                                                               | DEFERRED              | Future event/action layer.                                                                           |
+| Design Validation Pass 01 findings                                                                          | APPROVED              | Human Review approved propagation to Design System v1.1.                                             |
+| Settled is transient, not permanent Saved UI                                                                | APPROVED              | Avoid persistent noise after successful acknowledgement.                                             |
+| Unavailable is a dedicated contextual tombstone                                                             | APPROVED              | Unsafe detail must be replaced while surrounding collection context remains.                         |
 
 ## Reopening rule
+
 A proposed change to a FROZEN contract must document: the new evidence, affected layers, compatibility/migration impact, alternatives, and why the existing decision is no longer valid. Do not change it inside an unrelated implementation/design task.

@@ -1,4 +1,8 @@
-import type { ActivityEvent, Comment, EffectiveAccess } from "../../domain/contracts";
+import type {
+  ActivityEvent,
+  Comment,
+  EffectiveAccess,
+} from "../../domain/contracts";
 import type { WorkItemListItem } from "../work-items/model";
 
 export const RB142_COMMENT =
@@ -18,9 +22,7 @@ export type Rb142CommandType =
   | "workItem.transitionStatus";
 
 export type Rb142CommandPayload =
-  | { priority: "urgent" }
-  | { body: string }
-  | { statusId: "status-review" };
+  { priority: "urgent" } | { body: string } | { statusId: "status-review" };
 
 export type Rb142Command = {
   commandType: Rb142CommandType;
@@ -33,10 +35,21 @@ export type Rb142Command = {
 };
 
 export type Rb142CommandResult =
-  | { ok: true; canonical: Rb142Snapshot; resultVersion: number; replayed: boolean }
+  | {
+      ok: true;
+      canonical: Rb142Snapshot;
+      resultVersion: number;
+      replayed: boolean;
+    }
   | {
       ok: false;
-      code: "offline" | "transport_error" | "conflict" | "forbidden" | "not_found" | "validation";
+      code:
+        | "offline"
+        | "transport_error"
+        | "conflict"
+        | "forbidden"
+        | "not_found"
+        | "validation";
       message: string;
       canonical?: Rb142Snapshot;
     };

@@ -1,1 +1,45 @@
-import {createContext,useContext,useEffect,useMemo,useState,type ReactNode} from "react";import type {Models} from "appwrite";import type {AppwriteServices} from "../infrastructure/appwrite/client";type SessionState={status:"loading"|"authenticated"|"anonymous";user:Models.User<Models.Preferences>|null};const C=createContext<SessionState|null>(null);export function SessionProvider({services,children}:{services:AppwriteServices;children:ReactNode}){const[state,setState]=useState<SessionState>({status:"loading",user:null});useEffect(()=>{let active=true;services.account.get().then(user=>active&&setState({status:"authenticated",user})).catch(()=>active&&setState({status:"anonymous",user:null}));return()=>{active=false}},[services]);return <C.Provider value={useMemo(()=>state,[state])}>{children}</C.Provider>}export function useSession(){const v=useContext(C);if(!v)throw new Error("useSession must be used inside SessionProvider");return v}
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import type { Models } from "appwrite";
+import type { AppwriteServices } from "../infrastructure/appwrite/client";
+type SessionState = {
+  status: "loading" | "authenticated" | "anonymous";
+  user: Models.User<Models.Preferences> | null;
+};
+const C = createContext<SessionState | null>(null);
+export function SessionProvider({
+  services,
+  children,
+}: {
+  services: AppwriteServices;
+  children: ReactNode;
+}) {
+  const [state, setState] = useState<SessionState>({
+    status: "loading",
+    user: null,
+  });
+  useEffect(() => {
+    let active = true;
+    services.account
+      .get()
+      .then((user) => active && setState({ status: "authenticated", user }))
+      .catch(() => active && setState({ status: "anonymous", user: null }));
+    return () => {
+      active = false;
+    };
+  }, [services]);
+  return (
+    <C.Provider value={useMemo(() => state, [state])}>{children}</C.Provider>
+  );
+}
+export function useSession() {
+  const v = useContext(C);
+  if (!v) throw new Error("useSession must be used inside SessionProvider");
+  return v;
+}

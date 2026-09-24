@@ -3,9 +3,11 @@
 > Canonical first-read for any agent joining Orynqo. Read this before acting.
 
 ## Product
+
 Orynqo is a large-scale collaborative work/project-management platform. The product direction is compact, mature, keyboard-friendly productivity software with information density comparable to tools such as Notion/Linear without cloning them.
 
 ## Sources of truth
+
 - Repository: `YounasKhan2/Orynqo`
 - Figma file key: `c3gkf8389lOXtHCaOUhlhm`
 - Current design validation page: `29 Design Validation Pass 01`, node `61:2`, board `61:3`
@@ -15,6 +17,7 @@ Orynqo is a large-scale collaborative work/project-management platform. The prod
 Chats are working sessions, not the durable project record. Git + Figma + approved handoff documents are authoritative.
 
 ## Current product architecture
+
 Five independent access dimensions: containment, ownership, membership, visibility, permission scope.
 
 - Organization: governance/billing/security boundary.
@@ -37,6 +40,7 @@ Authorization order:
 `identity → membership/scope → visibility → role/capability → explicit grant/restriction → resource state`.
 
 ## Frozen UX principles
+
 - 4px base; 8px primary rhythm.
 - Desktop reference 1440px.
 - Sidebar ~224–240px; secondary 240–280px; top bar 48px.
@@ -50,13 +54,15 @@ Authorization order:
 - Work Item table contract: Checkbox | Key | Title | Status | Priority | Assignee | Cycle. Priority and Cycle must not disappear on desktop.
 
 Responsive ranges:
+
 - Wide ≥1280: persistent nav, collection + inspector.
 - Compact 1024–1279: rail/narrow or overlay inspector.
 - Tablet 720–1023: drawer + dominant inspector pane/overlay.
 - Narrow <720: one primary surface; Work Item full-page detail.
-Responsive changes composition, not semantics.
+  Responsive changes composition, not semantics.
 
 ## Technology baseline
+
 Frontend: React 19, TypeScript, Vite, TanStack Router, TanStack Query, TanStack Table, TanStack Virtual, React Hook Form, Zod, Tailwind CSS v4, accessible headless primitives where appropriate, Lucide, Inter. Zustand only for genuinely shared client UI state.
 
 Backend/infrastructure: Appwrite Cloud Education/Student plan for Auth, Data, Realtime, Storage, Functions and later Messaging where justified.
@@ -74,9 +80,11 @@ Do not add NestJS, Redis, Kafka, Elasticsearch, Kubernetes, GraphQL or similar i
 Docker policy: native Vite/React for fast HMR; Docker Compose only for supporting development infrastructure when actually needed.
 
 ## First production-shaped slice
+
 RB-142 — Add workspace-level role inheritance.
 
 Golden Flow:
+
 1. Open inspector.
 2. Priority High → Urgent pending.
 3. Priority settles; Activity records High → Urgent.
@@ -89,6 +97,7 @@ Golden Flow:
 Edge contracts include rollback on failure, offline/not-synced, same-field conflict, different-field realtime reconciliation, permission revocation, archive, delete/unavailable, idempotent echo dedupe and collection continuity.
 
 ## Current implementation checkpoint
+
 Branch: `feat/rb-142-golden-flow`
 Approved base Golden Flow commit: `f8ad7cbf474e2f4a3b93a5d6860dc700f38e94fb`
 Approved integration correction: `d86654b3c534698be7edb2835237e739161aa556`
@@ -96,9 +105,11 @@ Approved integration correction: `d86654b3c534698be7edb2835237e739161aa556`
 ORY-000→ORY-015 and the RB-142 development vertical slice have passed their engineering gates. Actual Appwrite persistence and actual Appwrite Realtime remain intentionally deferred. Do not imply the development server/event transport is production Appwrite.
 
 ## Current design checkpoint
+
 Design Validation Pass 01 (Figma node `61:2`) passed Human Review. Approved corrections are being propagated toward **Orynqo Design System v1.1**. No engineering should resume until v1.1 propagation receives final review/freeze.
 
 Approved design-state additions/refinements:
+
 - Property Mutation State: Idle, Pending, Failure, Offline/Not synced, Conflict, Read-only.
 - Settled is transient state-machine behavior, not a persistent “Saved” badge.
 - Property Conflict Resolver: canonical vs attempted value + explicit resolution.
@@ -108,10 +119,13 @@ Approved design-state additions/refinements:
 - Activity hierarchy: change → values → actor/time.
 
 ## Deferred
+
 Project-specific workflow overrides, project-local custom fields, Organization templates, automation UI, production Appwrite persistence/realtime integration, dedicated queues/search infrastructure until justified.
 
 ## Required onboarding
+
 Before making changes, read:
+
 1. `05-CURRENT-STATE.md`
 2. `04-DECISIONS-AND-FROZEN-CONTRACTS.md`
 3. Your role-specific handoff.

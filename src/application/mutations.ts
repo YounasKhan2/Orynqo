@@ -47,7 +47,11 @@ export class PendingMutationRegistry {
     if (current) this.entries.set(mutationId, { ...current, ...patch });
   }
   settle(mutationId: string) {
-    this.update(mutationId, { phase: "settled", failureCode: undefined, error: undefined });
+    this.update(mutationId, {
+      phase: "settled",
+      failureCode: undefined,
+      error: undefined,
+    });
   }
   remove(mutationId: string) {
     this.entries.delete(mutationId);
