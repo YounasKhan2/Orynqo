@@ -36,6 +36,22 @@ UI → application command → Appwrite Function → authorization/lifecycle/wor
 
 See `docs/architecture/rb-142-production-boundary.md`.
 
+## Project handbook
+
+Before starting or handing off feature work, read `docs/PROJECT-HANDBOOK.md`.
+
+It is the living orientation source for:
+
+- complete Orynqo product capability map;
+- Pre-MVP vs Post-MVP/deferred scope;
+- approved technology and architecture boundaries;
+- design-system, authorization, realtime, responsive, and accessibility contracts;
+- current implementation status and active roadmap;
+- mandatory agent operating and handoff rules;
+- the requirement to update documentation as implementation progresses.
+
+Do not infer complete product scope from the currently implemented routes. Figma and approved product documentation define the product; the repository records how much has been implemented so far.
+
 ## Run locally
 
 1. Copy `.env.example` to `.env.local`.
