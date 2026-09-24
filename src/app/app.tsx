@@ -1,1 +1,26 @@
-import {QueryClient,QueryClientProvider} from "@tanstack/react-query";import {RouterProvider} from "@tanstack/react-router";import {useState} from "react";import {readEnvironment} from "../config/env";import {createAppwriteServices} from "../infrastructure/appwrite/client";import {SessionProvider} from "./session";import {router} from "./router";export function App(){const[q]=useState(()=>new QueryClient({defaultOptions:{queries:{staleTime:30000,retry:1},mutations:{retry:0}}}));const[s]=useState(()=>createAppwriteServices(readEnvironment()));return <QueryClientProvider client={q}><SessionProvider services={s}><RouterProvider router={router}/></SessionProvider></QueryClientProvider>}
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider } from "@tanstack/react-router";
+import { useState } from "react";
+import { readEnvironment } from "../config/env";
+import { createAppwriteServices } from "../infrastructure/appwrite/client";
+import { SessionProvider } from "./session";
+import { router } from "./router";
+export function App() {
+  const [q] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: { staleTime: 30000, retry: 1 },
+          mutations: { retry: 0 },
+        },
+      }),
+  );
+  const [s] = useState(() => createAppwriteServices(readEnvironment()));
+  return (
+    <QueryClientProvider client={q}>
+      <SessionProvider services={s}>
+        <RouterProvider router={router} />
+      </SessionProvider>
+    </QueryClientProvider>
+  );
+}

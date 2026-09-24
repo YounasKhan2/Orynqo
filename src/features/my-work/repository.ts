@@ -1,14 +1,31 @@
 import { allDevelopmentWorkItems } from "../work-items/fixture-repository";
-import type { MyWorkInput, MyWorkRepository, MyWorkResult, PersonalWorkItem } from "./model";
+import type {
+  MyWorkInput,
+  MyWorkRepository,
+  MyWorkResult,
+  PersonalWorkItem,
+} from "./model";
 
-const personalMetadata: Record<string, Pick<PersonalWorkItem, "personalBucket" | "projectLabel">> = {
+const personalMetadata: Record<
+  string,
+  Pick<PersonalWorkItem, "personalBucket" | "projectLabel">
+> = {
   "wi-rb-142": { personalBucket: "today", projectLabel: "Platform Core" },
   "wi-rb-121": { personalBucket: "upcoming", projectLabel: "Notifications" },
   "wi-rb-205": { personalBucket: "today", projectLabel: "Identity Migration" },
-  "wi-rb-233": { personalBucket: "upcoming", projectLabel: "Developer Experience" },
+  "wi-rb-233": {
+    personalBucket: "upcoming",
+    projectLabel: "Developer Experience",
+  },
 };
 
-const priorityRank = { urgent: 0, high: 1, medium: 2, low: 3, none: 4 } as const;
+const priorityRank = {
+  urgent: 0,
+  high: 1,
+  medium: 2,
+  low: 3,
+  none: 4,
+} as const;
 
 export class DevelopmentMyWorkRepository implements MyWorkRepository {
   async list(input: MyWorkInput): Promise<MyWorkResult> {
@@ -21,7 +38,10 @@ export class DevelopmentMyWorkRepository implements MyWorkRepository {
           item.assigneeId === input.userId &&
           Boolean(personalMetadata[item.id]),
       )
-      .map((item) => ({ ...item, ...personalMetadata[item.id] }) as PersonalWorkItem);
+      .map(
+        (item) =>
+          ({ ...item, ...personalMetadata[item.id] }) as PersonalWorkItem,
+      );
 
     if (input.statusFilter === "not-done") {
       items = items.filter((item) => item.statusLabel !== "Done");
@@ -38,7 +58,10 @@ export class DevelopmentMyWorkRepository implements MyWorkRepository {
     items = [...items].sort((a, b) => {
       if (input.sort === "title") return a.title.localeCompare(b.title);
       if (input.sort === "priority") {
-        return priorityRank[a.priority] - priorityRank[b.priority] || a.key.localeCompare(b.key, undefined, { numeric: true });
+        return (
+          priorityRank[a.priority] - priorityRank[b.priority] ||
+          a.key.localeCompare(b.key, undefined, { numeric: true })
+        );
       }
       return a.key.localeCompare(b.key, undefined, { numeric: true });
     });
@@ -60,7 +83,7 @@ export class DevelopmentMyWorkRepository implements MyWorkRepository {
             ? groupId === "today"
               ? "Today"
               : "Upcoming"
-            : groupItems[0]?.projectLabel ?? groupId;
+            : (groupItems[0]?.projectLabel ?? groupId);
         return { id: groupId, label, items: groupItems };
       })
       .filter((group) => group.items.length > 0);
@@ -69,4 +92,5 @@ export class DevelopmentMyWorkRepository implements MyWorkRepository {
   }
 }
 
-export const myWorkRepository: MyWorkRepository = new DevelopmentMyWorkRepository();
+export const myWorkRepository: MyWorkRepository =
+  new DevelopmentMyWorkRepository();

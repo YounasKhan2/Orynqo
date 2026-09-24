@@ -17,7 +17,9 @@ export class Rb142DevelopmentEventTransport {
 
   subscribe(listener: Listener) {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   deliver(event: Rb142DevelopmentEvent) {
@@ -30,9 +32,9 @@ export class Rb142DevelopmentEventTransport {
     mutationId?: string,
     eventId = `rb142-event-${++this.sequence}`,
   ) {
-    const event = {
+    const event: Rb142DevelopmentEvent = {
       eventId,
-      mutationId,
+      ...(mutationId === undefined ? {} : { mutationId }),
       resourceVersion: canonical.workItem.version,
       changedFields,
       canonical,
@@ -42,23 +44,38 @@ export class Rb142DevelopmentEventTransport {
   }
 
   remoteAssigneeChange() {
-    return this.emitCanonical(["assigneeId"], rb142DevelopmentServer.remoteAssigneeChange());
+    return this.emitCanonical(
+      ["assigneeId"],
+      rb142DevelopmentServer.remoteAssigneeChange(),
+    );
   }
 
   remotePriorityChange(priority: "low" | "medium" | "high" | "urgent") {
-    return this.emitCanonical(["priority"], rb142DevelopmentServer.remotePriorityChange(priority));
+    return this.emitCanonical(
+      ["priority"],
+      rb142DevelopmentServer.remotePriorityChange(priority),
+    );
   }
 
   revokeAccess() {
-    return this.emitCanonical(["access"], rb142DevelopmentServer.revokeAccess());
+    return this.emitCanonical(
+      ["access"],
+      rb142DevelopmentServer.revokeAccess(),
+    );
   }
 
   archive() {
-    return this.emitCanonical(["lifecycle"], rb142DevelopmentServer.remoteArchive());
+    return this.emitCanonical(
+      ["lifecycle"],
+      rb142DevelopmentServer.remoteArchive(),
+    );
   }
 
   delete() {
-    return this.emitCanonical(["unavailable"], rb142DevelopmentServer.remoteDelete());
+    return this.emitCanonical(
+      ["unavailable"],
+      rb142DevelopmentServer.remoteDelete(),
+    );
   }
 }
 

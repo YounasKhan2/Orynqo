@@ -47,11 +47,12 @@ export class PendingMutationRegistry {
     if (current) this.entries.set(mutationId, { ...current, ...patch });
   }
   settle(mutationId: string) {
-    this.update(mutationId, {
-      phase: "settled",
-      failureCode: undefined,
-      error: undefined,
-    });
+    const current = this.entries.get(mutationId);
+    if (!current) return;
+    const settled: PendingMutation = { ...current, phase: "settled" };
+    delete settled.failureCode;
+    delete settled.error;
+    this.entries.set(mutationId, settled);
   }
   remove(mutationId: string) {
     this.entries.delete(mutationId);
@@ -79,8 +80,6 @@ export async function executeDomainMutation<TPayload, TCanonical>(
   registry: PendingMutationRegistry,
   plan: MutationPlan<TPayload, TCanonical>,
 ): Promise<CommandResult<TCanonical>> {
-  // Optimistic intent is intentionally applied before connectivity is checked.
-  // When offline it remains visible but unacknowledged and is never canonical.
   const snapshot = plan.optimistic(client);
   registry.register({
     mutationId: plan.command.mutationId,
@@ -120,9 +119,6 @@ export async function executeDomainMutation<TPayload, TCanonical>(
     });
     return result;
   } catch (error) {
-    // Transport failure is not a domain/version conflict. Roll back the cache,
-    // retain the registry entry and mutationId so the same logical attempt can
-    // be retried deterministically.
     plan.rollback(client, snapshot);
     registry.update(plan.command.mutationId, {
       phase: isOnline() ? "failure" : "offline",
