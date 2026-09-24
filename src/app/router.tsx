@@ -1,15 +1,33 @@
-import { Navigate, Outlet, createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
+import {
+  Navigate,
+  Outlet,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from "@tanstack/react-router";
 import { z } from "zod";
 import { AppShell } from "./shell";
 import { WorkItemsPage } from "../features/work-items/WorkItemsPage";
 import "../features/work-items/work-items.css";
 
-const rootRoute = createRootRoute({ component: () => <AppShell><Outlet /></AppShell> });
+const rootRoute = createRootRoute({
+  component: () => (
+    <AppShell>
+      <Outlet />
+    </AppShell>
+  ),
+});
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: () => <Navigate to="/projects/$projectId/issues" params={{ projectId: "platform-core" }} search={{ status: "not-done", sort: "key" }} />,
+  component: () => (
+    <Navigate
+      to="/projects/$projectId/issues"
+      params={{ projectId: "platform-core" }}
+      search={{ status: "not-done", sort: "key" }}
+    />
+  ),
 });
 
 const workItemsSearch = z.object({
@@ -29,4 +47,8 @@ const workItemsRoute = createRoute({
 const routeTree = rootRoute.addChildren([indexRoute, workItemsRoute]);
 export const router = createRouter({ routeTree });
 
-declare module "@tanstack/react-router" { interface Register { router: typeof router; } }
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
+}

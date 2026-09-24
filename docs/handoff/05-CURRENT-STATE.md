@@ -10,24 +10,29 @@
 **PM status:** integration / baseline preparation
 
 ## Repository
+
 Repository: `YounasKhan2/Orynqo`
 
 Approved engineering branch: `feat/rb-142-golden-flow`
 
 Approved commits:
+
 - Golden Flow base: `f8ad7cbf474e2f4a3b93a5d6860dc700f38e94fb`
 - Final integration correction: `d86654b3c534698be7edb2835237e739161aa556`
 
 Handoff pack branch: `docs/agent-handoff-pack-v1` (created from the approved RB-142 branch).
 
 ## Figma — Design System v1.1 frozen
+
 File key: `c3gkf8389lOXtHCaOUhlhm`
 
 Design Validation Pass 01 remains preserved:
+
 - Page node `61:2`
 - Board `61:3`
 
 Final propagation inspected and approved:
+
 - System Library additions `62:2`
 - RB-142 regression/state appendix `62:242`
 - Responsive propagation `62:465`
@@ -39,6 +44,7 @@ Final propagation inspected and approved:
 **Design version:** Orynqo Design System v1.1 — FROZEN.
 
 Final review confirmed:
+
 - Property Mutation State family exists.
 - Priority/Status conflict resolvers exist.
 - Context Notice Access/Lifecycle remains distinct from Unavailable.
@@ -52,6 +58,7 @@ Final review confirmed:
 - No new tokens were required.
 
 ## Completed engineering
+
 - ORY-000→010 foundation.
 - ORY-011 Work Item Collection.
 - ORY-012 WorkItemTable.
@@ -69,6 +76,7 @@ Final review confirmed:
 - Permission/archive/delete propagation paths.
 
 ## Intentionally deferred
+
 - Actual Appwrite persistence.
 - Actual Appwrite Realtime.
 - Broad implementation beyond the approved slice.
@@ -76,11 +84,13 @@ Final review confirmed:
 - Deferred product features listed in the Master/frozen decisions.
 
 ## Next permitted action
+
 Integrate the handoff documentation with the approved RB-142 engineering baseline, verify the resulting branch/build/tests, then merge the fully approved baseline to `main`.
 
 After main is stable, PM may select and explicitly open the next vertical slice on a fresh branch.
 
 ## STOP conditions
+
 - Design: no further design work until a new design gate is explicitly opened.
 - Engineering: no new feature work during baseline integration.
 - PM: do not select/start the next vertical slice until main contains the approved baseline and verification passes.

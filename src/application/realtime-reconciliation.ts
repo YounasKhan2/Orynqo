@@ -22,7 +22,9 @@ export class RecentRealtimeEventIds {
 
   constructor(private readonly capacity = 256) {
     if (!Number.isInteger(capacity) || capacity < 1) {
-      throw new Error("Realtime event dedupe capacity must be a positive integer");
+      throw new Error(
+        "Realtime event dedupe capacity must be a positive integer",
+      );
     }
   }
 
@@ -63,11 +65,15 @@ export function reconcileRealtime<T>(
     return "ack-local";
   }
 
-  const pending = registry.forResource(event.resourceId).find(
-    (entry) =>
-      entry.phase === "pending" &&
-      entry.affectedFields.some((field) => event.changedFields.includes(field)),
-  );
+  const pending = registry
+    .forResource(event.resourceId)
+    .find(
+      (entry) =>
+        entry.phase === "pending" &&
+        entry.affectedFields.some((field) =>
+          event.changedFields.includes(field),
+        ),
+    );
   if (pending) {
     registry.update(pending.mutationId, {
       phase: "conflict",

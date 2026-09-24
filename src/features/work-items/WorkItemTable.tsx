@@ -128,10 +128,7 @@ export function WorkItemTable({
             role="columnheader"
             className={header.id === "title" ? "title-cell" : ""}
           >
-            {flexRender(
-              header.column.columnDef.header,
-              header.getContext(),
-            )}
+            {flexRender(header.column.columnDef.header, header.getContext())}
           </div>
         ))}
       </div>
@@ -152,8 +149,7 @@ export function WorkItemTable({
                 data-row-id={row.id}
                 className="work-table-row"
                 tabIndex={
-                  selected ||
-                  (!selectedWorkItemId && virtualRow.index === 0)
+                  selected || (!selectedWorkItemId && virtualRow.index === 0)
                     ? 0
                     : -1
                 }
@@ -171,9 +167,7 @@ export function WorkItemTable({
                   <div
                     key={cell.id}
                     role="cell"
-                    className={
-                      cell.column.id === "title" ? "title-cell" : ""
-                    }
+                    className={cell.column.id === "title" ? "title-cell" : ""}
                     title={
                       cell.column.id === "title"
                         ? row.original.title

@@ -9,7 +9,9 @@ import {
 
 type Canonical = { id: string; priority: string; version: number };
 
-function plan(mutationId = "m1"): MutationPlan<{ priority: string }, Canonical> {
+function plan(
+  mutationId = "m1",
+): MutationPlan<{ priority: string }, Canonical> {
   return {
     commandType: "workItem.changePriority",
     affectedFields: ["priority"],
@@ -47,7 +49,12 @@ describe("mutation infrastructure", () => {
     client.setQueryData(["workItem", "wi-rb-142"], canonical);
     const registry = new PendingMutationRegistry();
     const gateway: CommandGateway = { execute: vi.fn() };
-    const result = await executeDomainMutation(client, gateway, registry, plan());
+    const result = await executeDomainMutation(
+      client,
+      gateway,
+      registry,
+      plan(),
+    );
 
     expect(result).toEqual({
       ok: false,
@@ -78,7 +85,12 @@ describe("mutation infrastructure", () => {
     const gateway: CommandGateway = {
       execute: vi.fn().mockRejectedValue(new Error("network down")),
     };
-    const result = await executeDomainMutation(client, gateway, registry, plan());
+    const result = await executeDomainMutation(
+      client,
+      gateway,
+      registry,
+      plan(),
+    );
 
     expect(result).toMatchObject({ ok: false, code: "transport_error" });
     expect(client.getQueryData(["workItem", "wi-rb-142"])).toEqual(canonical);

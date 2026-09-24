@@ -1,10 +1,107 @@
-import type { WorkItemCollectionInput,WorkItemCollectionRepository,WorkItemCollectionResult,WorkItemListItem } from "./model";
+import type {
+  WorkItemCollectionInput,
+  WorkItemCollectionRepository,
+  WorkItemCollectionResult,
+  WorkItemListItem,
+} from "./model";
 import { rb142DevelopmentServer } from "../rb142/development-server";
-const now="2026-09-24T00:00:00.000Z";
-const pinned:WorkItemListItem[]=[{id:"wi-rb-124",key:"RB-124",workspaceId:"workspace-product",projectId:"platform-core",title:"Virtualize project issue lists over 5k rows while preserving stable focus, selection and inspector context during realtime reconciliation",description:"Long-title regression fixture.",statusId:"status-in-progress",statusLabel:"In Progress",priority:"medium",assigneeId:"user-a",assigneeLabel:"A. Rivera",cycleId:"cycle-08",cycleLabel:"Cycle 08",milestoneId:null,lifecycle:"active",version:3,createdAt:now,updatedAt:now}];
-const generated:WorkItemListItem[]=Array.from({length:5198},(_,index)=>{const number=1000+index;const statusLabel=index%9===0?"Done":index%3===0?"Review":"In Progress";return{id:`wi-fixture-${number}`,key:`RB-${number}`,workspaceId:"workspace-product",projectId:"platform-core",title:`Platform reliability work item ${number}`,description:null,statusId:statusLabel==="Done"?"status-done":statusLabel==="Review"?"status-review":"status-in-progress",statusLabel,priority:index%11===0?"urgent":index%2===0?"high":"medium",assigneeId:"user-fixture",assigneeLabel:index%2===0?"N. Chen":"S. Khan",cycleId:"cycle-08",cycleLabel:"Cycle 08",milestoneId:null,lifecycle:"active",version:1,createdAt:now,updatedAt:now} satisfies WorkItemListItem});
-export class DevelopmentWorkItemRepository implements WorkItemCollectionRepository{
- async list(input:WorkItemCollectionInput):Promise<WorkItemCollectionResult>{await Promise.resolve();const rb142=rb142DevelopmentServer.read();const source=rb142.unavailable?[...pinned,...generated]:[rb142.workItem,...pinned,...generated];const search=input.search?.trim().toLowerCase();let items=source.filter(i=>i.projectId===input.projectId);if(input.statusFilter!=="all")items=items.filter(i=>i.statusLabel!=="Done");if(search)items=items.filter(i=>i.key.toLowerCase().includes(search)||i.title.toLowerCase().includes(search));items=[...items].sort((a,b)=>input.sort==="title"?a.title.localeCompare(b.title):input.sort==="priority"?a.priority.localeCompare(b.priority):a.key.localeCompare(b.key,undefined,{numeric:true}));return{items,totalCount:items.length,stale:false}}
- async getById(id:string):Promise<WorkItemListItem>{await Promise.resolve();if(id==="wi-rb-142"){const s=rb142DevelopmentServer.read();if(s.unavailable)throw new Error("Work Item not found");return s.workItem}const item=[...pinned,...generated].find(c=>c.id===id);if(!item)throw new Error("Work Item not found");return item}
+const now = "2026-09-24T00:00:00.000Z";
+const pinned: WorkItemListItem[] = [
+  {
+    id: "wi-rb-124",
+    key: "RB-124",
+    workspaceId: "workspace-product",
+    projectId: "platform-core",
+    title:
+      "Virtualize project issue lists over 5k rows while preserving stable focus, selection and inspector context during realtime reconciliation",
+    description: "Long-title regression fixture.",
+    statusId: "status-in-progress",
+    statusLabel: "In Progress",
+    priority: "medium",
+    assigneeId: "user-a",
+    assigneeLabel: "A. Rivera",
+    cycleId: "cycle-08",
+    cycleLabel: "Cycle 08",
+    milestoneId: null,
+    lifecycle: "active",
+    version: 3,
+    createdAt: now,
+    updatedAt: now,
+  },
+];
+const generated: WorkItemListItem[] = Array.from(
+  { length: 5198 },
+  (_, index) => {
+    const number = 1000 + index;
+    const statusLabel =
+      index % 9 === 0 ? "Done" : index % 3 === 0 ? "Review" : "In Progress";
+    return {
+      id: `wi-fixture-${number}`,
+      key: `RB-${number}`,
+      workspaceId: "workspace-product",
+      projectId: "platform-core",
+      title: `Platform reliability work item ${number}`,
+      description: null,
+      statusId:
+        statusLabel === "Done"
+          ? "status-done"
+          : statusLabel === "Review"
+            ? "status-review"
+            : "status-in-progress",
+      statusLabel,
+      priority:
+        index % 11 === 0 ? "urgent" : index % 2 === 0 ? "high" : "medium",
+      assigneeId: "user-fixture",
+      assigneeLabel: index % 2 === 0 ? "N. Chen" : "S. Khan",
+      cycleId: "cycle-08",
+      cycleLabel: "Cycle 08",
+      milestoneId: null,
+      lifecycle: "active",
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
+    } satisfies WorkItemListItem;
+  },
+);
+export class DevelopmentWorkItemRepository implements WorkItemCollectionRepository {
+  async list(
+    input: WorkItemCollectionInput,
+  ): Promise<WorkItemCollectionResult> {
+    await Promise.resolve();
+    const rb142 = rb142DevelopmentServer.read();
+    const source = rb142.unavailable
+      ? [...pinned, ...generated]
+      : [rb142.workItem, ...pinned, ...generated];
+    const search = input.search?.trim().toLowerCase();
+    let items = source.filter((i) => i.projectId === input.projectId);
+    if (input.statusFilter !== "all")
+      items = items.filter((i) => i.statusLabel !== "Done");
+    if (search)
+      items = items.filter(
+        (i) =>
+          i.key.toLowerCase().includes(search) ||
+          i.title.toLowerCase().includes(search),
+      );
+    items = [...items].sort((a, b) =>
+      input.sort === "title"
+        ? a.title.localeCompare(b.title)
+        : input.sort === "priority"
+          ? a.priority.localeCompare(b.priority)
+          : a.key.localeCompare(b.key, undefined, { numeric: true }),
+    );
+    return { items, totalCount: items.length, stale: false };
+  }
+  async getById(id: string): Promise<WorkItemListItem> {
+    await Promise.resolve();
+    if (id === "wi-rb-142") {
+      const s = rb142DevelopmentServer.read();
+      if (s.unavailable) throw new Error("Work Item not found");
+      return s.workItem;
+    }
+    const item = [...pinned, ...generated].find((c) => c.id === id);
+    if (!item) throw new Error("Work Item not found");
+    return item;
+  }
 }
-export const workItemRepository:WorkItemCollectionRepository=new DevelopmentWorkItemRepository();
+export const workItemRepository: WorkItemCollectionRepository =
+  new DevelopmentWorkItemRepository();

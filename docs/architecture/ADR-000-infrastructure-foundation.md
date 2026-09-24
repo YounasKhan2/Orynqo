@@ -20,6 +20,7 @@ Status: Accepted for ORY-000–010
 Current Appwrite TablesDB docs support atomic staged transactions across tables with conflict detection. Permissions support users, teams, team roles and memberships. Realtime subscriptions are permission-secured. Server-side Functions remain the intended boundary for sensitive commands when native client permissions cannot express Orynqo rules.
 
 References:
+
 - https://appwrite.io/docs/products/databases/tablesdb/transactions
 - https://appwrite.io/docs/advanced/security/permissions
 - https://appwrite.io/docs/products/auth/teams

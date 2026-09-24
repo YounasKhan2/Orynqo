@@ -62,17 +62,30 @@ describe("realtime reconciliation", () => {
 
   it("rejects stale canonical versions", () => {
     expect(
-      reconcileRealtime(event({ resourceVersion: 7 }), 7, pending(), new RecentRealtimeEventIds()),
+      reconcileRealtime(
+        event({ resourceVersion: 7 }),
+        7,
+        pending(),
+        new RecentRealtimeEventIds(),
+      ),
     ).toBe("ignore-stale");
   });
 
   it("bounds event-id memory with FIFO eviction", () => {
     const recent = new RecentRealtimeEventIds(2);
     const registry = new PendingMutationRegistry();
-    expect(reconcileRealtime(event({ eventId: "e1" }), 7, registry, recent)).toBe("apply");
-    expect(reconcileRealtime(event({ eventId: "e2" }), 7, registry, recent)).toBe("apply");
-    expect(reconcileRealtime(event({ eventId: "e3" }), 7, registry, recent)).toBe("apply");
+    expect(
+      reconcileRealtime(event({ eventId: "e1" }), 7, registry, recent),
+    ).toBe("apply");
+    expect(
+      reconcileRealtime(event({ eventId: "e2" }), 7, registry, recent),
+    ).toBe("apply");
+    expect(
+      reconcileRealtime(event({ eventId: "e3" }), 7, registry, recent),
+    ).toBe("apply");
     expect(recent.size).toBe(2);
-    expect(reconcileRealtime(event({ eventId: "e3" }), 7, registry, recent)).toBe("duplicate-event");
+    expect(
+      reconcileRealtime(event({ eventId: "e3" }), 7, registry, recent),
+    ).toBe("duplicate-event");
   });
 });

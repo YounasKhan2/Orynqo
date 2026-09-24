@@ -7,7 +7,10 @@ export function useWorkItemCollection(input: WorkItemCollectionInput) {
   return useQuery({
     queryKey: queryKeys.workItems({
       projectId: input.projectId,
-      filters: { status: input.statusFilter ?? "not-done", q: input.search ?? "" },
+      filters: {
+        status: input.statusFilter ?? "not-done",
+        q: input.search ?? "",
+      },
       sort: input.sort ?? "key",
     }),
     queryFn: () => workItemRepository.list(input),
