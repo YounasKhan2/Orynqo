@@ -48,7 +48,7 @@ describe("RB-142 corrected integration", () => {
     );
     expect(result.ok).toBe(true);
     expect(
-      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))
+      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))!
         .workItem,
     ).toMatchObject({ priority: "urgent", version: 8 });
     expect(
@@ -65,7 +65,7 @@ describe("RB-142 corrected integration", () => {
       priorityMutationPlan({ mutationId: "m1", expectedVersion: 7 }),
     );
     expect(
-      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))
+      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))!
         .workItem.priority,
     ).toBe("high");
     expect(
@@ -123,7 +123,7 @@ describe("RB-142 corrected integration", () => {
       (registry.get("m1")?.canonicalValue as Rb142Snapshot).workItem.priority,
     ).toBe("low");
     expect(
-      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))
+      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))!
         .workItem.priority,
     ).toBe("high");
   });
@@ -138,6 +138,6 @@ describe("RB-142 corrected integration", () => {
     const final = client.getQueryData<Rb142Snapshot>(
       queryKeys.workItem("wi-rb-142"),
     );
-    expect(final.unavailable).toBe(true);
+    expect(final?.unavailable).toBe(true);
   });
 });

@@ -33,7 +33,7 @@ describe("RB-142 query projection reconciliation", () => {
     const { key } = seed(client);
     applyRb142OptimisticFields(client, { priority: "urgent" });
     expect(
-      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))
+      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))!
         .workItem,
     ).toMatchObject({ priority: "urgent", version: 7 });
     expect(
@@ -47,7 +47,7 @@ describe("RB-142 query projection reconciliation", () => {
     applyRb142OptimisticFields(client, { priority: "urgent" });
     restoreRb142QueryCache(client, previous);
     expect(
-      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))
+      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))!
         .workItem.priority,
     ).toBe("high");
     expect(
@@ -63,7 +63,7 @@ describe("RB-142 query projection reconciliation", () => {
     canonical.workItem.version = 8;
     applyRb142CanonicalToQueryCache(client, canonical);
     expect(
-      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))
+      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))!
         .workItem.statusLabel,
     ).toBe("Review");
     expect(
@@ -82,7 +82,7 @@ describe("RB-142 query projection reconciliation", () => {
       preservePendingFields: ["priority"],
     });
     expect(
-      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))
+      client.getQueryData<Rb142Snapshot>(queryKeys.workItem("wi-rb-142"))!
         .workItem,
     ).toMatchObject({ priority: "urgent", assigneeLabel: "N. Chen" });
     expect(

@@ -32,9 +32,9 @@ export class Rb142DevelopmentEventTransport {
     mutationId?: string,
     eventId = `rb142-event-${++this.sequence}`,
   ) {
-    const event = {
+    const event: Rb142DevelopmentEvent = {
       eventId,
-      mutationId,
+      ...(mutationId === undefined ? {} : { mutationId }),
       resourceVersion: canonical.workItem.version,
       changedFields,
       canonical,
